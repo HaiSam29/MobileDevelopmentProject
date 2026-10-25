@@ -1,15 +1,29 @@
-*.iml
+# Gradle
 .gradle
-/local.properties
+/build
+/captures
+.externalNativeBuild
+.cxx
+.kotlin
+
+# Lokale config
+local.properties
+
+# Android Studio / IntelliJ
+*.iml
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+
+# Signing keys
+*.jks
+*.keystore
+
+# OS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
