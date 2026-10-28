@@ -16,6 +16,10 @@ import com.example.mobiledevelopmentproject.ui.theme.MobileDevelopmentProjectThe
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.google.firebase.auth.FirebaseAuth.getInstance()
+            .createUserWithEmailAndPassword("test@test.be", "test123456")
+            .addOnSuccessListener { android.util.Log.d("FirebaseTest", "OK: ${it.user?.uid}") }
+            .addOnFailureListener { android.util.Log.e("FirebaseTest", "FOUT", it) }
         enableEdgeToEdge()
         setContent {
             MobileDevelopmentProjectTheme {
