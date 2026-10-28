@@ -16,7 +16,7 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Registreren en inloggen, rol opslaan in `users` in Firestore | Room-database met tabellen |
+| Registreren en inloggen, rol opslaan in `users` in Firestore (A1, A2) | Room-database met tabellen |
 | Kaart tonen (OSMDroid) | Firestore-koppeling voor winkels, pakketten en reservaties |
 
 ---
@@ -26,7 +26,7 @@
 | Haitam | Mohamed |
 |---|---|
 | Adres opzoeken via Nominatim, met cache | Security rules in Firestore |
-| Scherm "Mijn winkel" met pin en automatisch adres | Uitloggen en juiste startscherm per rol |
+| Scherm "Mijn winkel" met pin en automatisch adres (H1, H2) | Uitloggen en juiste startscherm per rol (A2) |
 
 ---
 
@@ -34,8 +34,8 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Locatie-toestemming vragen en eigen locatie op de kaart, pin zetten bij weigering | Scherm "Pakket aanmaken" |
-| Foutmeldingen bij inloggen en registreren | Foto toevoegen aan pakket |
+| Locatie-toestemming vragen en eigen locatie op de kaart, pin zetten bij weigering (K1) | Scherm "Pakket aanmaken" (H3) |
+| Foutmeldingen bij inloggen en registreren (A3) | Foto toevoegen aan pakket (H4) |
 
 ---
 
@@ -43,8 +43,8 @@
 
 | Haitam | Mohamed |
 |---|---|
-| "Pakketten in de buurt van {gemeente}" | Lijst met pakketten in de buurt |
-| Navigatiebalk onderaan voor de klant | Lijst realtime bijwerken |
+| "Pakketten in de buurt van {gemeente}" (K2) | Lijst met pakketten in de buurt (K3) |
+| Navigatiebalk onderaan voor de klant | Lijst realtime bijwerken (K5) |
 
 ---
 
@@ -52,8 +52,8 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Detailscherm van een pakket met kleine kaart | Scherm "Mijn pakketten" voor de handelaar |
-| Kaart-tab met winkels | Favorieten |
+| Detailscherm van een pakket met kleine kaart (K7) | Scherm "Mijn pakketten" voor de handelaar (H5) |
+| Kaart-tab met winkels (K4) | Favorieten (K12) |
 
 ---
 
@@ -61,8 +61,8 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Kaart realtime bijwerken | Reserveren |
-| Alle gevallen van locatie-toestemming, met knop naar instellingen | Ophaalcode na reservatie |
+| Kaart realtime bijwerken (K5) | Reserveren (K8) |
+| Alle gevallen van locatie-toestemming, met knop naar instellingen (K1) | Ophaalcode na reservatie (K9) |
 
 ---
 
@@ -70,8 +70,8 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Meldingen bij lege lijsten en geen internet | Scherm "Bestellingen", ook offline |
-| Laadindicatoren en foutmeldingen in eigen schermen | Laadindicatoren en foutmeldingen in eigen schermen |
+| Meldingen bij lege lijsten en geen internet (G1) | Scherm "Bestellingen", ook offline (K10) |
+| Laadindicatoren en foutmeldingen in eigen schermen (G1, G3) | Laadindicatoren en foutmeldingen in eigen schermen (G1, G3) |
 
 ---
 
@@ -79,7 +79,7 @@
 
 | Haitam | Mohamed |
 |---|---|
-| Rotatie zonder dataverlies in eigen schermen | Rotatie zonder dataverlies in eigen schermen |
+| Rotatie zonder dataverlies in eigen schermen (G2) | Rotatie zonder dataverlies in eigen schermen (G2) |
 | Alle teksten naar strings.xml in eigen schermen | Alle teksten naar strings.xml in eigen schermen |
 
 ---
