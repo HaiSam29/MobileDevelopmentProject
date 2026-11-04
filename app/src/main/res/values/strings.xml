@@ -11,7 +11,26 @@
     <string name="login_no_account">Nog geen account?</string>
     <string name="link_register">Registreren</string>
 
+    <!-- Registreren -->
+    <string name="action_back">Terug</string>
+    <string name="register_title">Account maken</string>
+    <string name="register_subtitle">Vul je gegevens in en kies hoe je de app gebruikt.</string>
+    <string name="label_name">Naam</string>
+    <string name="hint_name">Je naam</string>
+    <string name="hint_new_password">Minstens 6 tekens</string>
+    <string name="label_role">Ik ben een</string>
+    <string name="role_customer">Klant</string>
+    <string name="role_customer_description">Pakketten zoeken en ophalen</string>
+    <string name="role_merchant">Handelaar</string>
+    <string name="role_merchant_description">Overschotten aanbieden</string>
+    <string name="button_register">Registreren</string>
+    <string name="register_has_account">Al een account?</string>
+    <string name="link_login">Inloggen</string>
+
     <!-- Foutmeldingen -->
+    <string name="error_name_required">Vul je naam in.</string>
+    <string name="error_email_in_use">Dit e-mailadres is al in gebruik.</string>
+    <string name="error_password_too_short">Je wachtwoord moet minstens 6 tekens hebben.</string>
     <string name="error_email_required">Vul je e-mailadres in.</string>
     <string name="error_email_invalid">Dit is geen geldig e-mailadres.</string>
     <string name="error_password_required">Vul je wachtwoord in.</string>
