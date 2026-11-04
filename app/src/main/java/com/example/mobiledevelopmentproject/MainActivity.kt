@@ -7,7 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
+import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
 import com.example.mobiledevelopmentproject.ui.theme.MobileDevelopmentProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,9 +20,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             MobileDevelopmentProjectTheme {
                 // Tijdelijk: in stap 6 komt hier de AppNavHost.
-                LoginScreen(
-                    onRegisterClick = {},
-                    onLoginSuccess = { Log.d("Login", "Ingelogd") }
+                RegisterScreen(
+                    onBackClick = {},
+                    onLoginClick = {},
+                    onRegisterSuccess = { Log.d("Register", "Geregistreerd") }
                 )
             }
         }
