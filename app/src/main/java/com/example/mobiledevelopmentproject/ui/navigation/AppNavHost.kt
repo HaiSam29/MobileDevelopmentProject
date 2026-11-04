@@ -36,7 +36,9 @@ fun AppNavHost() {
             )
         }
         composable(Routes.HOME) {
-            HomePlaceholderScreen()
+            HomePlaceholderScreen(
+                onOpenMapClick = { navController.navigate(Routes.MAP) }
+            )
         }
         composable(Routes.MAP) {
             MapScreen()

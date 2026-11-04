@@ -29,6 +29,7 @@
 
     <!-- Tijdelijk startscherm -->
     <string name="home_placeholder">Je bent ingelogd.</string>
+    <string name="button_open_map">Naar de kaart</string>
 
     <!-- Foutmeldingen -->
     <string name="error_name_required">Vul je naam in.</string>
