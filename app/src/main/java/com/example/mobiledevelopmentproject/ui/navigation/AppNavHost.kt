@@ -8,11 +8,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
 import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
 import com.example.mobiledevelopmentproject.ui.home.HomePlaceholderScreen
+import com.example.mobiledevelopmentproject.ui.map.MapScreen
 
 private object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val HOME = "home"
+    const val MAP = "map"
 }
 
 @Composable
@@ -35,6 +37,9 @@ fun AppNavHost() {
         }
         composable(Routes.HOME) {
             HomePlaceholderScreen()
+        }
+        composable(Routes.MAP) {
+            MapScreen()
         }
     }
 }
