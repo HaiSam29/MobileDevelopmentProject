@@ -58,7 +58,7 @@ private fun rememberMapView(
             controller.setZoom(zoom)
             controller.setCenter(GeoPoint(latitude, longitude))
             // De gebruiksvoorwaarden van OpenStreetMap vereisen een zichtbare bronvermelding.
-            overlays.add(CopyrightOverlay(context))
+            overlays.add(CopyrightOverlay(context).apply { setAlignRight(true) })
         }
     }
 
