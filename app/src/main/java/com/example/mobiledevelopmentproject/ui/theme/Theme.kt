@@ -1,57 +1,48 @@
 package com.example.mobiledevelopmentproject.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+// De huisstijl is enkel licht, dus er is geen donker kleurenschema.
+// De surfaceContainer-kleuren staan er ook bij: anders krijgen kaarten en de
+// navigatiebalk de paarse standaardtint van Material.
+private val RestjeColorScheme = lightColorScheme(
+    primary = GreenPrimary,
+    onPrimary = SurfaceWhite,
+    primaryContainer = GreenLight,
+    onPrimaryContainer = GreenDark,
+    secondary = GreenDark,
+    onSecondary = SurfaceWhite,
+    secondaryContainer = GreenLight,
+    onSecondaryContainer = GreenDark,
+    tertiary = GreenDark,
+    onTertiary = SurfaceWhite,
+    tertiaryContainer = GreenLight,
+    onTertiaryContainer = GreenDark,
+    background = BackgroundGray,
+    onBackground = TextDark,
+    surface = SurfaceWhite,
+    onSurface = TextDark,
+    surfaceVariant = BackgroundGray,
+    onSurfaceVariant = TextGray,
+    surfaceContainerLowest = SurfaceWhite,
+    surfaceContainerLow = SurfaceWhite,
+    surfaceContainer = SurfaceWhite,
+    surfaceContainerHigh = SurfaceWhite,
+    surfaceContainerHighest = BackgroundGray,
+    outline = BorderGray,
+    outlineVariant = BorderGray,
+    error = ErrorText,
+    onError = SurfaceWhite,
+    errorContainer = ErrorBackground,
+    onErrorContainer = ErrorText
 )
 
 @Composable
-fun MobileDevelopmentProjectTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
+fun MobileDevelopmentProjectTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = RestjeColorScheme,
         typography = Typography,
         content = content
     )
