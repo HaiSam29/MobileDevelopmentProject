@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">Restje</string>
+
+    <!-- Inloggen -->
+    <string name="login_tagline">Red eten van de winkel om de hoek.</string>
+    <string name="label_email">E-mail</string>
+    <string name="label_password">Wachtwoord</string>
+    <string name="hint_email">naam@voorbeeld.be</string>
+    <string name="hint_password">Je wachtwoord</string>
+    <string name="button_login">Inloggen</string>
+    <string name="login_no_account">Nog geen account?</string>
+    <string name="link_register">Registreren</string>
+
+    <!-- Foutmeldingen -->
+    <string name="error_email_required">Vul je e-mailadres in.</string>
+    <string name="error_email_invalid">Dit is geen geldig e-mailadres.</string>
+    <string name="error_password_required">Vul je wachtwoord in.</string>
+    <string name="error_wrong_credentials">E-mailadres of wachtwoord is onjuist.</string>
+    <string name="error_no_internet">Geen internetverbinding. Probeer het opnieuw.</string>
+    <string name="error_too_many_attempts">Te veel pogingen. Probeer het later opnieuw.</string>
+    <string name="error_general">Er ging iets mis. Probeer het opnieuw.</string>
 </resources>
