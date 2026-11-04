@@ -27,6 +27,9 @@
     <string name="register_has_account">Al een account?</string>
     <string name="link_login">Inloggen</string>
 
+    <!-- Tijdelijk startscherm -->
+    <string name="home_placeholder">Je bent ingelogd.</string>
+
     <!-- Foutmeldingen -->
     <string name="error_name_required">Vul je naam in.</string>
     <string name="error_email_in_use">Dit e-mailadres is al in gebruik.</string>
