@@ -1,9 +1,8 @@
 package com.example.mobiledevelopmentproject.data
 
-import com.example.mobiledevelopmentproject.data.model.FoodPackage
+import com.example.mobiledevelopmentproject.data.model.Bag
 import com.example.mobiledevelopmentproject.data.model.OrderStatus
 import com.example.mobiledevelopmentproject.data.model.Reservation
-import com.example.mobiledevelopmentproject.data.model.Store
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.snapshots
@@ -12,8 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 private const val RESERVATIONS_COLLECTION = "reservations"
-private const val PACKAGES_COLLECTION = "packages"
-private const val STORES_COLLECTION = "stores"
+private const val BAGS_COLLECTION = "bags"
 private const val PICKUP_CODE_LENGTH = 6
 
 // Zonder 0/O en 1/I, die lijken te veel op elkaar als je de code in de winkel toont.
@@ -29,43 +27,41 @@ class ReservationRepository(
     // Verlaagt het aantal van het pakket en maakt de reservatie aan, allebei of geen van beide.
     // In een transactie, zodat twee klanten niet tegelijk het laatste pakket krijgen.
     // Een transactie werkt niet offline: zonder internet faalt ze met code UNAVAILABLE.
-    suspend fun reserve(packageId: String, customerId: String, quantity: Int): Reservation {
-        val packageRef = firestore.collection(PACKAGES_COLLECTION).document(packageId)
+    suspend fun reserve(bagId: String, customerId: String, quantity: Int): Reservation {
+        val bagRef = firestore.collection(BAGS_COLLECTION).document(bagId)
         val reservationRef = reservations.document()
 
         return firestore.runTransaction { transaction ->
-            val foodPackage = transaction.get(packageRef).toObject(FoodPackage::class.java)
+            val bag = transaction.get(bagRef).toObject(Bag::class.java)
                 ?: throw FirebaseFirestoreException(
-                    "Package not found",
+                    "Bag not found",
                     FirebaseFirestoreException.Code.NOT_FOUND
                 )
 
-            if (foodPackage.quantityAvailable < quantity) {
+            if (!bag.active || bag.quantityLeft < quantity) {
                 throw FirebaseFirestoreException(
-                    "Not enough packages left",
+                    "Not enough bags left",
                     FirebaseFirestoreException.Code.FAILED_PRECONDITION
                 )
             }
 
-            val storeRef = firestore.collection(STORES_COLLECTION).document(foodPackage.storeId)
-            val store = transaction.get(storeRef).toObject(Store::class.java)
-
+            // storeName staat al in het pakket, de winkel apart lezen is niet nodig.
             val reservation = Reservation(
-                packageId = packageId,
-                storeId = foodPackage.storeId,
+                bagId = bagId,
+                storeId = bag.storeId,
                 customerId = customerId,
-                packageTitle = foodPackage.title,
-                storeName = store?.name.orEmpty(),
                 quantity = quantity,
                 pickupCode = generatePickupCode(),
-                pickupFrom = foodPackage.pickupFrom,
-                pickupUntil = foodPackage.pickupUntil,
-                status = OrderStatus.RESERVED,
-                createdAt = System.currentTimeMillis()
+                status = OrderStatus.RESERVED.value,
+                createdAt = System.currentTimeMillis(),
+                bagTitle = bag.title,
+                storeName = bag.storeName,
+                pickupStart = bag.pickupStart,
+                pickupEnd = bag.pickupEnd
             )
 
             // In een transactie komen eerst alle get's, pas daarna de schrijfacties.
-            transaction.update(packageRef, "quantityAvailable", foodPackage.quantityAvailable - quantity)
+            transaction.update(bagRef, "quantityLeft", bag.quantityLeft - quantity)
             transaction.set(reservationRef, reservation)
 
             reservation.copy(id = reservationRef.id)
