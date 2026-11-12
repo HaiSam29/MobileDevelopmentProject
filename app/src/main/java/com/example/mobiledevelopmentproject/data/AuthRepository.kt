@@ -19,6 +19,11 @@ class AuthRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
 
+    // De uid van de ingelogde gebruiker, of null als niemand ingelogd is.
+    fun currentUserId(): String? {
+        return auth.currentUser?.uid
+    }
+
     suspend fun login(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).await()
     }
