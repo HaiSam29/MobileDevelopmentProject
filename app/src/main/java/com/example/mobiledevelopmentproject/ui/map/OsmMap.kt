@@ -20,20 +20,24 @@ import org.osmdroid.views.overlay.CopyrightOverlay
 // Herbruikbare kaart. latitude, longitude en zoom bepalen enkel de startpositie:
 // een andere waarde doorgeven verplaatst een kaart die al bestaat niet.
 // onPositionChange krijgt de huidige positie wanneer het scherm gepauzeerd wordt.
+// update wordt na elke recompositie opgeroepen met de MapView,
+// zo kan een ander scherm er bv. een pin of markers op zetten.
 @Composable
 fun OsmMap(
     latitude: Double,
     longitude: Double,
     zoom: Double,
     modifier: Modifier = Modifier,
-    onPositionChange: (latitude: Double, longitude: Double, zoom: Double) -> Unit = { _, _, _ -> }
+    onPositionChange: (latitude: Double, longitude: Double, zoom: Double) -> Unit = { _, _, _ -> },
+    update: (MapView) -> Unit = {}
 ) {
     val mapView = rememberMapView(latitude, longitude, zoom, onPositionChange)
 
     // clipToBounds: osmdroid tekent anders tegels buiten zijn eigen vlak.
     AndroidView(
         factory = { mapView },
-        modifier = modifier.clipToBounds()
+        modifier = modifier.clipToBounds(),
+        update = update
     )
 }
 
