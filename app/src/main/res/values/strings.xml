@@ -31,6 +31,26 @@
     <string name="home_placeholder">Je bent ingelogd.</string>
     <string name="button_open_map">Naar de kaart</string>
 
+    <!-- Mijn winkel -->
+    <string name="my_store_title">Mijn winkel</string>
+    <string name="label_store_name">Naam van de winkel</string>
+    <string name="hint_store_name">Bv. Bakkerij Het Korenaar</string>
+    <string name="label_category">Categorie</string>
+    <string name="hint_category">Kies een categorie</string>
+    <string name="label_location">Locatie</string>
+    <string name="map_pin_hint">Tik op de kaart of versleep de pin</string>
+    <string name="address_looking_up">Adres opzoeken…</string>
+    <string name="address_auto_filled">Adres automatisch ingevuld, je kan het nog aanpassen</string>
+    <string name="label_street">Straat en huisnummer</string>
+    <string name="hint_street">Bv. Bruul 42</string>
+    <string name="label_postcode">Postcode</string>
+    <string name="hint_postcode">Bv. 2800</string>
+    <string name="label_city">Gemeente</string>
+    <string name="hint_city">Bv. Mechelen</string>
+    <string name="button_save">Opslaan</string>
+    <string name="button_retry">Opnieuw proberen</string>
+    <string name="store_saved">Je winkel is opgeslagen.</string>
+
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>
     <string name="category_supermarket">Supermarkt</string>
