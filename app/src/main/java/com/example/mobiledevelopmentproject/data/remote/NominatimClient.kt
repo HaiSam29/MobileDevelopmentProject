@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit
 // Moet eindigen op "/", anders weigert Retrofit de URL.
 private const val BASE_URL = "https://nominatim.openstreetmap.org/"
 private const val TIMEOUT_SECONDS = 10L
+// Regel van Nominatim: maximaal 1 aanvraag per seconde.
+private const val MIN_INTERVAL_MS = 1_000L
 
 // object: één client voor de hele app. Een OkHttpClient aanmaken is duur,
 // en zo delen alle aanvragen dezelfde verbindingen.
@@ -27,6 +29,10 @@ object NominatimClient {
         .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
         .build()
+
+    // Eén limiter voor de hele app. Elke ViewModel maakt een eigen repository,
+    // met een limiter per repository zouden twee schermen samen te veel aanvragen kunnen sturen.
+    val rateLimiter = RateLimiter(MIN_INTERVAL_MS)
 
     // by lazy: Retrofit wordt pas gebouwd bij het eerste gebruik.
     val api: NominatimApi by lazy {
