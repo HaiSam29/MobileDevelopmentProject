@@ -2,16 +2,23 @@ package com.example.mobiledevelopmentproject.ui.store
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mobiledevelopmentproject.R
 import com.example.mobiledevelopmentproject.data.AuthRepository
+import com.example.mobiledevelopmentproject.data.GeocodingException
+import com.example.mobiledevelopmentproject.data.GeocodingRepository
 import com.example.mobiledevelopmentproject.data.StoreRepository
+import com.example.mobiledevelopmentproject.data.local.AppDatabase
 import com.example.mobiledevelopmentproject.data.model.Store
 import com.example.mobiledevelopmentproject.data.model.StoreCategory
 import com.example.mobiledevelopmentproject.ui.auth.toErrorMessage
 import com.example.mobiledevelopmentproject.ui.map.MapPoint
 import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,9 +39,12 @@ data class MyStoreUiState(
     val pin: MapPoint? = null,
     val mapCenter: MapPoint = MapPoint.ANTWERP,
     val mapZoom: Double = STORE_ZOOM,
-    // Laden en opslaan
+    // Laden, adres opzoeken en opslaan
     val isLoadingStore: Boolean = true,
+    val isLookingUpAddress: Boolean = false,
     val isSaving: Boolean = false,
+    // true als het adres net automatisch ingevuld is, het scherm toont dan een hint.
+    val addressAutoFilled: Boolean = false,
     // Foutmeldingen bij een veld
     @StringRes val nameError: Int? = null,
     @StringRes val categoryError: Int? = null,
@@ -44,18 +54,24 @@ data class MyStoreUiState(
     @StringRes val cityError: Int? = null,
     // Algemene foutmeldingen
     @StringRes val loadError: Int? = null,
+    @StringRes val addressLookupError: Int? = null,
     @StringRes val saveError: Int? = null,
     // true na een geslaagde opslag, het scherm toont dan één keer een melding.
     val isSaved: Boolean = false
 )
 
 class MyStoreViewModel(
+    private val geocodingRepository: GeocodingRepository,
     private val storeRepository: StoreRepository = StoreRepository(),
     private val authRepository: AuthRepository = AuthRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MyStoreUiState())
     val uiState: StateFlow<MyStoreUiState> = _uiState.asStateFlow()
+
+    // De lopende adresopzoeking. Bij een nieuwe pin stoppen we de vorige,
+    // anders kan een oud antwoord later binnenkomen en het nieuwe adres overschrijven.
+    private var lookupJob: Job? = null
 
     // init loopt één keer: na een rotatie bestaat deze ViewModel nog,
     // dus de winkel wordt niet opnieuw geladen en de ingevulde velden blijven staan.
@@ -107,9 +123,46 @@ class MyStoreViewModel(
         _uiState.update { it.copy(city = city, cityError = null, saveError = null) }
     }
 
-    // Opgeroepen na een tik op de kaart of als de pin losgelaten wordt.
+    // Opgeroepen na een tik op de kaart of als de pin losgelaten wordt, nooit tijdens het slepen.
+    // Zet de pin en vraagt het adres op. GeocodingRepository kijkt eerst in de cache
+    // en houdt zich aan max 1 aanvraag per seconde.
     fun onPinPlaced(point: MapPoint) {
-        _uiState.update { it.copy(pin = point, locationError = null, saveError = null) }
+        _uiState.update {
+            it.copy(
+                pin = point,
+                locationError = null,
+                saveError = null,
+                isLookingUpAddress = true,
+                addressAutoFilled = false,
+                addressLookupError = null
+            )
+        }
+
+        lookupJob?.cancel()
+        lookupJob = viewModelScope.launch {
+            try {
+                val address = geocodingRepository.getStreetAddress(point.latitude, point.longitude)
+                // Een nieuwe plek is een nieuw adres: alle drie de velden worden overschreven.
+                // De handelaar kan ze daarna nog aanpassen.
+                _uiState.update {
+                    it.copy(
+                        street = address.street,
+                        postcode = address.postcode.orEmpty(),
+                        city = address.city,
+                        streetError = null,
+                        postcodeError = null,
+                        cityError = null,
+                        isLookingUpAddress = false,
+                        addressAutoFilled = true
+                    )
+                }
+            } catch (e: GeocodingException) {
+                // De pin blijft staan, de handelaar kan het adres zelf intypen.
+                _uiState.update {
+                    it.copy(isLookingUpAddress = false, addressLookupError = e.toErrorMessage())
+                }
+            }
+        }
     }
 
     // De kaart meldt waar ze naar kijkt wanneer het scherm pauzeert (bv. bij een rotatie).
@@ -124,7 +177,8 @@ class MyStoreViewModel(
 
     fun save() {
         val state = _uiState.value
-        if (state.isLoadingStore || state.isSaving) return
+        // Tijdens het opzoeken nog niet opslaan, anders bewaren we het oude adres bij de nieuwe pin.
+        if (state.isLoadingStore || state.isLookingUpAddress || state.isSaving) return
 
         val validated = state.validate()
         if (validated.hasFieldErrors()) {
@@ -162,6 +216,26 @@ class MyStoreViewModel(
             }
         }
     }
+
+    companion object {
+        // GeocodingRepository heeft de DAO uit Room nodig, en daarvoor een Context.
+        // Een factory geeft de ViewModel die mee, zonder dat de ViewModel zelf een Context bijhoudt.
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                val dao = AppDatabase.getInstance(application).cachedAddressDao()
+                MyStoreViewModel(GeocodingRepository(dao))
+            }
+        }
+    }
+}
+
+// Kiest de melding bij een fout tijdens het opzoeken van een adres.
+@StringRes
+private fun GeocodingException.toErrorMessage(): Int = when (reason) {
+    GeocodingException.Reason.NO_INTERNET -> R.string.error_no_internet
+    GeocodingException.Reason.NOT_FOUND -> R.string.error_address_not_found
+    GeocodingException.Reason.SERVER_ERROR -> R.string.error_address_lookup_failed
 }
 
 // Vult het formulier met een winkel uit Firestore en zet de kaart op de pin.
