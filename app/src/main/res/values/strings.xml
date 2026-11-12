@@ -42,4 +42,6 @@
     <string name="error_no_internet">Geen internetverbinding. Probeer het opnieuw.</string>
     <string name="error_too_many_attempts">Te veel pogingen. Probeer het later opnieuw.</string>
     <string name="error_general">Er ging iets mis. Probeer het opnieuw.</string>
+    <string name="error_address_lookup_failed">Adres opzoeken is mislukt. Probeer het later opnieuw.</string>
+    <string name="error_address_not_found">Geen adres gevonden op deze plek.</string>
 </resources>
