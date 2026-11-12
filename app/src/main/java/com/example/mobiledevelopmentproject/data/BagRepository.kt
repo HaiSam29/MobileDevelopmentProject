@@ -1,6 +1,6 @@
 package com.example.mobiledevelopmentproject.data
 
-import com.example.mobiledevelopmentproject.data.model.FoodPackage
+import com.example.mobiledevelopmentproject.data.model.Bag
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
@@ -9,58 +9,59 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 
-private const val PACKAGES_COLLECTION = "packages"
+private const val BAGS_COLLECTION = "bags"
 private const val SAVE_TIMEOUT_MS = 10_000L
 
 // Bij een fout gooit elke functie een FirebaseException, de ViewModel vangt die op.
-class PackageRepository(
+class BagRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
 
-    private val packages = firestore.collection(PACKAGES_COLLECTION)
+    private val bags = firestore.collection(BAGS_COLLECTION)
 
     // Geeft het id terug dat Firestore aan het nieuwe pakket gaf.
-    suspend fun addPackage(foodPackage: FoodPackage): String {
+    suspend fun addBag(bag: Bag): String {
         // document() zonder naam maakt een nieuw document met een willekeurig id.
-        val document = packages.document()
+        val document = bags.document()
 
         // Zonder internet blijft set().await() wachten, zie AuthRepository.
         val saved = withTimeoutOrNull(SAVE_TIMEOUT_MS) {
-            document.set(foodPackage).await()
+            document.set(bag).await()
             true
         }
 
         if (saved == null) {
-            throw FirebaseNetworkException("Saving the package timed out")
+            throw FirebaseNetworkException("Saving the bag timed out")
         }
         return document.id
     }
 
-    // Pakketten die nog niet uitverkocht zijn, voor de klant.
+    // Actieve pakketten die nog niet uitverkocht zijn, voor de klant.
+    // active wordt in Kotlin gefilterd: een tweede filter in Firestore vraagt een extra index.
     // Sorteren op afstand gebeurt in de ViewModel, want daarvoor is de locatie nodig.
-    fun observeAvailablePackages(): Flow<List<FoodPackage>> {
-        return packages
-            .whereGreaterThan("quantityAvailable", 0)
+    fun observeAvailableBags(): Flow<List<Bag>> {
+        return bags
+            .whereGreaterThan("quantityLeft", 0)
             .snapshots()
-            .map { snapshot -> snapshot.toObjects(FoodPackage::class.java) }
+            .map { snapshot -> snapshot.toObjects(Bag::class.java).filter { it.active } }
     }
 
     // Alle pakketten van één winkel, ook uitverkochte, voor de handelaar.
     // Gesorteerd in Kotlin, want orderBy op een ander veld dan de filter vraagt een extra index in Firestore.
-    fun observePackagesForStore(storeId: String): Flow<List<FoodPackage>> {
-        return packages
+    fun observeBagsForStore(storeId: String): Flow<List<Bag>> {
+        return bags
             .whereEqualTo("storeId", storeId)
             .snapshots()
             .map { snapshot ->
-                snapshot.toObjects(FoodPackage::class.java).sortedByDescending { it.createdAt }
+                snapshot.toObjects(Bag::class.java).sortedByDescending { it.createdAt }
             }
     }
 
     // Eén pakket, zodat "Nog 3 over" op het detailscherm meteen bijwerkt.
     // Geeft null als het pakket verwijderd is.
-    fun observePackage(packageId: String): Flow<FoodPackage?> {
-        return packages.document(packageId)
+    fun observeBag(bagId: String): Flow<Bag?> {
+        return bags.document(bagId)
             .snapshots()
-            .map { snapshot -> snapshot.toObject(FoodPackage::class.java) }
+            .map { snapshot -> snapshot.toObject(Bag::class.java) }
     }
 }

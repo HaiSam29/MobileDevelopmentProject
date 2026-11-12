@@ -9,14 +9,15 @@ private const val DATABASE_NAME = "restje.db"
 
 // Verhoog version als je een tabel of kolom wijzigt.
 @Database(
-    entities = [OrderEntity::class, FavoriteEntity::class],
+    entities = [CachedReservation::class, FavoriteStore::class, CachedAddress::class],
     version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun orderDao(): OrderDao
-    abstract fun favoriteDao(): FavoriteDao
+    abstract fun cachedReservationDao(): CachedReservationDao
+    abstract fun favoriteStoreDao(): FavoriteStoreDao
+    abstract fun cachedAddressDao(): CachedAddressDao
 
     companion object {
         // Eén database voor de hele app, een tweede openen is traag en kan botsen.
