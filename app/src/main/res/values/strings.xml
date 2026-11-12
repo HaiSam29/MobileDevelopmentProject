@@ -30,6 +30,7 @@
     <!-- Tijdelijk startscherm -->
     <string name="home_placeholder">Je bent ingelogd.</string>
     <string name="button_open_map">Naar de kaart</string>
+    <string name="button_open_my_store">Naar mijn winkel</string>
 
     <!-- Mijn winkel -->
     <string name="my_store_title">Mijn winkel</string>

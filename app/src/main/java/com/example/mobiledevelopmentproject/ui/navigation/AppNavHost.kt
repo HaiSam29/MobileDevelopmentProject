@@ -9,12 +9,14 @@ import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
 import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
 import com.example.mobiledevelopmentproject.ui.home.HomePlaceholderScreen
 import com.example.mobiledevelopmentproject.ui.map.MapScreen
+import com.example.mobiledevelopmentproject.ui.store.MyStoreScreen
 
 private object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val HOME = "home"
     const val MAP = "map"
+    const val MY_STORE = "my_store"
 }
 
 @Composable
@@ -37,11 +39,15 @@ fun AppNavHost() {
         }
         composable(Routes.HOME) {
             HomePlaceholderScreen(
-                onOpenMapClick = { navController.navigate(Routes.MAP) }
+                onOpenMapClick = { navController.navigate(Routes.MAP) },
+                onOpenMyStoreClick = { navController.navigate(Routes.MY_STORE) }
             )
         }
         composable(Routes.MAP) {
             MapScreen()
+        }
+        composable(Routes.MY_STORE) {
+            MyStoreScreen()
         }
     }
 }
