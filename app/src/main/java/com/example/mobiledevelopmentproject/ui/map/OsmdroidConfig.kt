@@ -1,11 +1,9 @@
 package com.example.mobiledevelopmentproject.ui.map
 
 import android.content.Context
+import com.example.mobiledevelopmentproject.data.USER_AGENT
 import org.osmdroid.config.Configuration
 import java.io.File
-
-// OpenStreetMap blokkeert apps die zich niet duidelijk identificeren.
-private const val USER_AGENT = "Restje/1.0 (studentenproject AP Hogeschool)"
 
 // Moet uitgevoerd zijn voordat de eerste MapView aangemaakt wordt.
 fun configureOsmdroid(context: Context) {
