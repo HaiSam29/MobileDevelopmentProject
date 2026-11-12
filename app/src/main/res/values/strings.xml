@@ -31,6 +31,13 @@
     <string name="home_placeholder">Je bent ingelogd.</string>
     <string name="button_open_map">Naar de kaart</string>
 
+    <!-- Categorieën van een winkel -->
+    <string name="category_bakery">Bakker</string>
+    <string name="category_supermarket">Supermarkt</string>
+    <string name="category_restaurant">Restaurant</string>
+    <string name="category_cafe">Café</string>
+    <string name="category_other">Andere</string>
+
     <!-- Foutmeldingen -->
     <string name="error_name_required">Vul je naam in.</string>
     <string name="error_email_in_use">Dit e-mailadres is al in gebruik.</string>
