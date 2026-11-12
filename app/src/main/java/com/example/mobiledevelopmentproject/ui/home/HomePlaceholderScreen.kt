@@ -17,8 +17,12 @@ import com.example.mobiledevelopmentproject.R
 
 // Tijdelijk scherm na inloggen. Wordt vervangen door het startscherm per rol.
 // De kaartknop verdwijnt zodra de navigatiebalk onderaan er is.
+// De knop "Mijn winkel" verdwijnt zodra het startscherm van de handelaar er is.
 @Composable
-fun HomePlaceholderScreen(onOpenMapClick: () -> Unit) {
+fun HomePlaceholderScreen(
+    onOpenMapClick: () -> Unit,
+    onOpenMyStoreClick: () -> Unit
+) {
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
@@ -33,6 +37,9 @@ fun HomePlaceholderScreen(onOpenMapClick: () -> Unit) {
             )
             Button(onClick = onOpenMapClick) {
                 Text(text = stringResource(R.string.button_open_map))
+            }
+            Button(onClick = onOpenMyStoreClick) {
+                Text(text = stringResource(R.string.button_open_my_store))
             }
         }
     }
