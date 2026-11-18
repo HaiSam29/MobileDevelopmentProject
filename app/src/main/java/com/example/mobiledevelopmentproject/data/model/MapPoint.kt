@@ -1,4 +1,4 @@
-package com.example.mobiledevelopmentproject.ui.map
+package com.example.mobiledevelopmentproject.data.model
 
 // Een punt op de kaart. Eigen klasse zodat de UiState en de ViewModel
 // geen GeoPoint van osmdroid of van Firestore nodig hebben (die heten allebei GeoPoint).
