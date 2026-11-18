@@ -10,6 +10,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,8 +82,14 @@ class RegisterViewModel(
             try {
                 repository.register(name, email, state.password, state.role)
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            } catch (e: CancellationException) {
+                // De coroutine wordt gestopt (scherm weg), dat is geen fout.
+                throw e
             } catch (e: FirebaseException) {
                 _uiState.update { it.withError(e).copy(isLoading = false) }
+            } catch (e: Exception) {
+                // Vangnet: elke andere fout geeft een algemene melding in plaats van een crash.
+                _uiState.update { it.copy(isLoading = false, generalError = R.string.error_general) }
             }
         }
     }

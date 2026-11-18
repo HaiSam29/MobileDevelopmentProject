@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mobiledevelopmentproject.R
 import com.example.mobiledevelopmentproject.data.AuthRepository
 import com.google.firebase.FirebaseException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,8 +57,14 @@ class LoginViewModel(
             try {
                 repository.login(email, state.password)
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            } catch (e: CancellationException) {
+                // De coroutine wordt gestopt (scherm weg), dat is geen fout.
+                throw e
             } catch (e: FirebaseException) {
                 _uiState.update { it.copy(isLoading = false, generalError = e.toErrorMessage()) }
+            } catch (e: Exception) {
+                // Vangnet: elke andere fout geeft een algemene melding in plaats van een crash.
+                _uiState.update { it.copy(isLoading = false, generalError = R.string.error_general) }
             }
         }
     }
