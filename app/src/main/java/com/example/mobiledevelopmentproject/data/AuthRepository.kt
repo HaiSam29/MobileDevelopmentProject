@@ -28,6 +28,11 @@ class AuthRepository(
         auth.signInWithEmailAndPassword(email, password).await()
     }
 
+    // Uitloggen gebeurt lokaal op het toestel, daarom is dit geen suspend-functie.
+    fun logout() {
+        auth.signOut()
+    }
+
     suspend fun register(name: String, email: String, password: String, role: UserRole) {
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val user = result.user ?: throw FirebaseException("No user after registration")
