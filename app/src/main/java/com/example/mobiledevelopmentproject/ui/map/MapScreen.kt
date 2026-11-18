@@ -15,10 +15,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -58,7 +62,19 @@ fun MapScreen(
     // dan toont Android geen venster en komt het antwoord meteen terug.
     val requestLocation = { permissionLauncher.launch(LOCATION_PERMISSIONS) }
 
-    Scaffold { innerPadding ->
+    val snackbarHostState = remember { SnackbarHostState() }
+    val pinSavedMessage = stringResource(R.string.location_pin_saved)
+
+    // Na "Gebruik deze locatie" één keer een melding tonen.
+    // onPinSavedMessageShown pas daarna, anders stopt de LaunchedEffect de melding meteen.
+    LaunchedEffect(uiState.isPinSaved) {
+        if (uiState.isPinSaved) {
+            snackbarHostState.showSnackbar(pinSavedMessage)
+            viewModel.onPinSavedMessageShown()
+        }
+    }
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
         val contentModifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
@@ -67,6 +83,18 @@ fun MapScreen(
             LocationRationale(
                 onAllowClick = requestLocation,
                 onChooseOnMapClick = viewModel::onChooseOnMap,
+                modifier = contentModifier
+            )
+        } else if (uiState.mode == LocationMode.PICK_PIN) {
+            PickLocationContent(
+                pin = uiState.pin,
+                center = uiState.mapCenter,
+                zoom = uiState.mapZoom,
+                permissionDenied = uiState.permissionDenied,
+                onPinPlaced = viewModel::onPinPlaced,
+                onPositionChange = viewModel::onMapPositionChange,
+                onBackClick = viewModel::onPickPinBack,
+                onUsePinClick = viewModel::onUsePin,
                 modifier = contentModifier
             )
         } else {

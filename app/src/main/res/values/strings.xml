@@ -62,6 +62,10 @@
     <string name="button_choose_on_map">Zelf kiezen op de kaart</string>
     <string name="location_loading">Je locatie zoeken…</string>
     <string name="action_my_location">Mijn locatie</string>
+    <string name="pick_location_title">Kies je locatie</string>
+    <string name="location_permission_denied">Je gaf geen toegang tot je locatie.</string>
+    <string name="button_use_location">Gebruik deze locatie</string>
+    <string name="location_pin_saved">Je locatie is opgeslagen.</string>
 
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>

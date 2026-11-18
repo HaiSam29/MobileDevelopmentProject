@@ -108,6 +108,12 @@ class MapViewModel(
         showPinPicker(permissionDenied = false)
     }
 
+    // Pijl terug bij "Kies je locatie": terug naar de uitleg, waar de klant
+    // alsnog toestemming kan geven. De pin blijft bewaard voor als hij terugkomt.
+    fun onPickPinBack() {
+        _uiState.update { it.copy(mode = LocationMode.ASK, permissionDenied = false) }
+    }
+
     // Opgeroepen na een tik op de kaart of als de pin losgelaten wordt.
     fun onPinPlaced(point: MapPoint) {
         _uiState.update { it.copy(pin = point) }
@@ -168,12 +174,13 @@ class MapViewModel(
                     mapZoom = MY_LOCATION_ZOOM,
                     centerOn = chosen.point
                 )
+                // Geen centerOn: de pin-kaart wordt pas na deze stap gemaakt
+                // en start dan al op mapCenter.
                 LocationSource.PIN -> it.copy(
                     mode = LocationMode.PICK_PIN,
                     pin = chosen.point,
                     mapCenter = chosen.point,
-                    mapZoom = MY_LOCATION_ZOOM,
-                    centerOn = chosen.point
+                    mapZoom = MY_LOCATION_ZOOM
                 )
             }
         }
