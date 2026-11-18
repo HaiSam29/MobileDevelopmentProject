@@ -40,7 +40,8 @@ fun AppNavHost() {
         composable(Routes.HOME) {
             HomePlaceholderScreen(
                 onOpenMapClick = { navController.navigate(Routes.MAP) },
-                onOpenMyStoreClick = { navController.navigate(Routes.MY_STORE) }
+                onOpenMyStoreClick = { navController.navigate(Routes.MY_STORE) },
+                onLoggedOut = { navController.navigateToLogin() }
             )
         }
         composable(Routes.MAP) {
@@ -57,5 +58,13 @@ fun AppNavHost() {
 private fun NavController.navigateToHome() {
     navigate(Routes.HOME) {
         popUpTo(Routes.LOGIN) { inclusive = true }
+    }
+}
+
+// popUpTo de hele graaf maakt de backstack leeg,
+// zodat de Terug-knop na het uitloggen niet terug in de app gaat.
+private fun NavController.navigateToLogin() {
+    navigate(Routes.LOGIN) {
+        popUpTo(graph.id) { inclusive = true }
     }
 }
