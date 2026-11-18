@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val MIN_PASSWORD_LENGTH = 6
+private const val ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL"
 
 data class RegisterUiState(
     val name: String = "",
@@ -106,7 +107,13 @@ class RegisterViewModel(
     private fun RegisterUiState.withError(e: FirebaseException): RegisterUiState = when (e) {
         is FirebaseAuthUserCollisionException -> copy(emailError = R.string.error_email_in_use)
         is FirebaseAuthWeakPasswordException -> copy(passwordError = R.string.error_password_too_short)
-        is FirebaseAuthInvalidCredentialsException -> copy(emailError = R.string.error_email_invalid)
+        // Firebase gebruikt InvalidCredentials voor meerdere fouten, enkel deze code gaat over het e-mailadres.
+        is FirebaseAuthInvalidCredentialsException ->
+            if (e.errorCode == ERROR_INVALID_EMAIL) {
+                copy(emailError = R.string.error_email_invalid)
+            } else {
+                copy(generalError = R.string.error_general)
+            }
         else -> copy(generalError = e.toErrorMessage())
     }
 }
