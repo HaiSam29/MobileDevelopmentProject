@@ -33,6 +33,13 @@
     <string name="button_open_my_store">Naar mijn winkel</string>
     <string name="button_logout">Uitloggen</string>
 
+    <!-- Startschermen per rol -->
+    <string name="customer_home_title">Ontdekken</string>
+    <string name="home_greeting">Hallo %1$s</string>
+    <string name="button_map">Kaart</string>
+    <string name="button_my_store">Mijn winkel</string>
+    <string name="button_create_bag">Pakket aanmaken</string>
+
     <!-- Mijn winkel -->
     <string name="my_store_title">Mijn winkel</string>
     <string name="label_store_name">Naam van de winkel</string>
