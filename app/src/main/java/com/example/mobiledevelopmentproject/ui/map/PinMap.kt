@@ -12,6 +12,9 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 
+// Herkent de pin tussen de andere markers op de kaart (bv. de eigen locatie).
+private const val PIN_MARKER_ID = "pin"
+
 // Kaart waarop de gebruiker één pin zet met een tik, of de pin versleept
 // (lang drukken op de pin en dan slepen).
 // onPinPlaced wordt enkel opgeroepen na een tik of als de pin losgelaten wordt,
@@ -77,7 +80,8 @@ private fun keepTouchesInMap(mapView: MapView) {
 // Zet de pin op de juiste plek, maakt hem aan als hij er nog niet is,
 // of haalt hem weg als pin null is.
 private fun showPin(mapView: MapView, pin: MapPoint?, onDragEnd: (MapPoint) -> Unit) {
-    var marker = mapView.overlays.filterIsInstance<Marker>().firstOrNull()
+    // Zoeken op id en niet op "de eerste Marker": er kunnen meer markers op de kaart staan.
+    var marker = mapView.overlays.filterIsInstance<Marker>().firstOrNull { it.id == PIN_MARKER_ID }
 
     if (pin == null) {
         marker?.let { mapView.overlays.remove(it) }
@@ -94,6 +98,7 @@ private fun showPin(mapView: MapView, pin: MapPoint?, onDragEnd: (MapPoint) -> U
 
 private fun createMarker(mapView: MapView, onDragEnd: (MapPoint) -> Unit): Marker {
     return Marker(mapView).apply {
+        id = PIN_MARKER_ID
         // De punt onderaan de pin staat op de gekozen plek.
         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         isDraggable = true
