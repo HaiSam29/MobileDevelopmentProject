@@ -60,6 +60,8 @@
     <string name="location_rationale_pin">Liever niet? Zet dan zelf een pin op de kaart</string>
     <string name="button_allow_location">Locatie toestaan</string>
     <string name="button_choose_on_map">Zelf kiezen op de kaart</string>
+    <string name="location_loading">Je locatie zoeken…</string>
+    <string name="action_my_location">Mijn locatie</string>
 
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>
