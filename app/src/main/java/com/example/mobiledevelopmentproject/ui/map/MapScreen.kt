@@ -11,19 +11,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel = viewModel()
+    viewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
         OsmMap(
-            latitude = uiState.latitude,
-            longitude = uiState.longitude,
-            zoom = uiState.zoom,
+            latitude = uiState.mapCenter.latitude,
+            longitude = uiState.mapCenter.longitude,
+            zoom = uiState.mapZoom,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            onPositionChange = viewModel::onPositionChange
+            onPositionChange = viewModel::onMapPositionChange
         )
     }
 }
