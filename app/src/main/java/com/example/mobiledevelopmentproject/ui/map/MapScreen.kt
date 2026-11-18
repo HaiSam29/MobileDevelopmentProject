@@ -3,17 +3,22 @@ package com.example.mobiledevelopmentproject.ui.map
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -116,16 +122,28 @@ fun MapScreen(
                     }
                 )
 
+                // Eigen val, want uiState is een gedelegeerde property ("by") en kan niet smart-cast worden.
+                val locationError = uiState.locationError
+
                 if (uiState.mode == LocationMode.LOADING) {
                     LoadingLocationCard(modifier = Modifier.align(Alignment.TopCenter))
+                } else if (uiState.mode == LocationMode.UNAVAILABLE && locationError != null) {
+                    LocationUnavailableCard(
+                        messageRes = locationError,
+                        onRetryClick = viewModel::onRetryLocation,
+                        onChooseOnMapClick = viewModel::onChooseOnMap,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
                 }
 
                 // Opnieuw je locatie ophalen en de kaart erop centreren, bv. na verschuiven.
+                // Extra ruimte onderaan: de bronvermelding van OpenStreetMap staat rechtsonder
+                // en moet zichtbaar blijven.
                 FloatingActionButton(
                     onClick = requestLocation,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(16.dp)
+                        .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 40.dp)
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_location_pin),
@@ -164,6 +182,59 @@ private fun LoadingLocationCard(modifier: Modifier = Modifier) {
         ) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
             Text(text = stringResource(R.string.location_loading), style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+// Kaartje bovenaan als er geen locatie is (locatie staat uit, of nog niet gevonden).
+// De klant kan opnieuw proberen of zelf een plek kiezen: hij zit nooit vast.
+@Composable
+private fun LocationUnavailableCard(
+    @StringRes messageRes: Int,
+    onRetryClick: () -> Unit,
+    onChooseOnMapClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        shadowElevation = 4.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_error),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+                Text(text = stringResource(messageRes), style = MaterialTheme.typography.bodyMedium)
+            }
+            Button(
+                onClick = onRetryClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(text = stringResource(R.string.button_retry), fontWeight = FontWeight.SemiBold)
+            }
+            OutlinedButton(
+                onClick = onChooseOnMapClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.button_choose_on_map),
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
     }
 }
