@@ -53,6 +53,14 @@
     <string name="button_retry">Opnieuw proberen</string>
     <string name="store_saved">Je winkel is opgeslagen.</string>
 
+    <!-- Locatie -->
+    <string name="location_rationale_title">Pakketten bij jou in de buurt</string>
+    <string name="location_rationale_text">We gebruiken je locatie om pakketten te tonen die dicht bij je zijn, met de afstand in km. Je locatie wordt nergens bewaard.</string>
+    <string name="location_rationale_precise">Kies bij voorkeur \"Precieze locatie\"</string>
+    <string name="location_rationale_pin">Liever niet? Zet dan zelf een pin op de kaart</string>
+    <string name="button_allow_location">Locatie toestaan</string>
+    <string name="button_choose_on_map">Zelf kiezen op de kaart</string>
+
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>
     <string name="category_supermarket">Supermarkt</string>
