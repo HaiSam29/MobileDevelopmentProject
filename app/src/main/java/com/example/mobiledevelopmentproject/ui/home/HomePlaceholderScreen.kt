@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobiledevelopmentproject.R
 
 // Tijdelijk scherm na inloggen. Wordt vervangen door het startscherm per rol.
@@ -21,7 +23,9 @@ import com.example.mobiledevelopmentproject.R
 @Composable
 fun HomePlaceholderScreen(
     onOpenMapClick: () -> Unit,
-    onOpenMyStoreClick: () -> Unit
+    onOpenMyStoreClick: () -> Unit,
+    onLoggedOut: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -40,6 +44,15 @@ fun HomePlaceholderScreen(
             }
             Button(onClick = onOpenMyStoreClick) {
                 Text(text = stringResource(R.string.button_open_my_store))
+            }
+            // Eerst uitloggen, daarna pas naar het inlogscherm.
+            OutlinedButton(
+                onClick = {
+                    viewModel.logout()
+                    onLoggedOut()
+                }
+            ) {
+                Text(text = stringResource(R.string.button_logout))
             }
         }
     }
