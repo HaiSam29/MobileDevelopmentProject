@@ -1,5 +1,6 @@
 package com.example.mobiledevelopmentproject.data
 
+import com.example.mobiledevelopmentproject.data.model.UserProfile
 import com.example.mobiledevelopmentproject.data.model.UserRole
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseNetworkException
@@ -26,6 +27,21 @@ class AuthRepository(
 
     suspend fun login(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password).await()
+    }
+
+    // Leest naam en rol van de ingelogde gebruiker uit users/{uid}.
+    // Zonder internet geeft Firestore de versie uit de cache als die er is,
+    // anders gooit get() een FirebaseFirestoreException (UNAVAILABLE).
+    suspend fun getUserRole(): UserProfile {
+        val uid = currentUserId() ?: throw FirebaseException("No user logged in")
+        val document = firestore.collection(USERS_COLLECTION).document(uid).get().await()
+
+        // Geen document of een onbekende rol: dan weten we niet welk startscherm past.
+        val role = UserRole.fromValue(document.getString("role"))
+            ?: throw FirebaseException("User has no valid role")
+        val name = document.getString("name").orEmpty()
+
+        return UserProfile(name = name, role = role)
     }
 
     // Uitloggen gebeurt lokaal op het toestel, daarom is dit geen suspend-functie.
