@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
 import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
+import com.example.mobiledevelopmentproject.ui.bag.CreateBagScreen
 import com.example.mobiledevelopmentproject.ui.customer.CustomerHomeScreen
 import com.example.mobiledevelopmentproject.ui.map.MapScreen
 import com.example.mobiledevelopmentproject.ui.merchant.MerchantHomeScreen
@@ -24,6 +25,7 @@ private object Routes {
     const val MERCHANT_HOME = "merchant_home"
     const val MAP = "map"
     const val MY_STORE = "my_store"
+    const val CREATE_BAG = "create_bag"
 
     // De naam gaat mee als optioneel argument, zo werkt het ook met een lege naam.
     const val ARG_NAME = "name"
@@ -75,8 +77,7 @@ fun AppNavHost() {
             MerchantHomeScreen(
                 name = entry.arguments?.getString(Routes.ARG_NAME).orEmpty(),
                 onMyStoreClick = { navController.navigate(Routes.MY_STORE) },
-                // Het scherm "Pakket aanmaken" komt later.
-                onCreateBagClick = {},
+                onCreateBagClick = { navController.navigate(Routes.CREATE_BAG) },
                 onLoggedOut = { navController.navigateToLogin() }
             )
         }
@@ -85,6 +86,19 @@ fun AppNavHost() {
         }
         composable(Routes.MY_STORE) {
             MyStoreScreen()
+        }
+        composable(Routes.CREATE_BAG) {
+            CreateBagScreen(
+                onBackClick = { navController.navigateUp() },
+                onBagCreated = { navController.navigateUp() },
+                // Zonder winkel naar "Mijn winkel". popUpTo haalt dit scherm van de backstack,
+                // zodat Terug daarna naar het startscherm gaat en niet naar een leeg formulier.
+                onMyStoreClick = {
+                    navController.navigate(Routes.MY_STORE) {
+                        popUpTo(Routes.CREATE_BAG) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

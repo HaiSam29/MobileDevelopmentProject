@@ -81,6 +81,29 @@
     <string name="category_cafe">Café</string>
     <string name="category_other">Andere</string>
 
+    <!-- Pakket aanmaken (H3) -->
+    <string name="create_bag_title">Nieuw pakket</string>
+    <string name="label_bag_title">Titel</string>
+    <string name="hint_bag_title">Bv. Verrassingspakket brood</string>
+    <string name="label_bag_description">Beschrijving</string>
+    <string name="hint_bag_description">Bv. Brood, koffiekoeken en taart die vandaag niet verkocht zijn.</string>
+    <string name="label_price">Prijs (€)</string>
+    <string name="hint_price">Bv. 4,50</string>
+    <string name="label_original_value">Originele waarde (€)</string>
+    <string name="hint_original_value">Bv. 12,00</string>
+    <string name="label_quantity">Aantal pakketten</string>
+    <string name="hint_quantity">Bv. 5</string>
+    <string name="label_pickup_window">Ophaalvenster vandaag</string>
+    <string name="label_pickup_start">Van</string>
+    <string name="label_pickup_end">Tot</string>
+    <string name="hint_pick_time">Kies uur</string>
+    <string name="action_pick_time">Uur kiezen</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Annuleren</string>
+    <string name="button_place_bag">Pakket plaatsen</string>
+    <string name="bag_saved">Je pakket is geplaatst.</string>
+    <string name="create_bag_no_store">Maak eerst je winkel aan, dan kan je een pakket plaatsen.</string>
+
     <!-- Foutmeldingen -->
     <string name="error_name_required">Vul je naam in.</string>
     <string name="error_email_in_use">Dit e-mailadres is al in gebruik.</string>
@@ -102,4 +125,13 @@
     <string name="error_address_not_found">Geen adres gevonden op deze plek.</string>
     <string name="error_location_off">Locatie staat uit op je toestel. Zet ze aan in de instellingen of kies zelf een plek op de kaart.</string>
     <string name="error_location_not_found">We vinden je locatie nog niet. Probeer het opnieuw of kies zelf een plek op de kaart.</string>
+    <string name="error_bag_title_required">Vul een titel in.</string>
+    <string name="error_bag_description_required">Vul een beschrijving in.</string>
+    <string name="error_price_invalid">Vul een geldige prijs in.</string>
+    <string name="error_price_not_lower">De prijs moet lager zijn dan de originele waarde.</string>
+    <string name="error_original_value_invalid">Vul een geldige waarde in.</string>
+    <string name="error_quantity_invalid">Vul een aantal van minstens 1 in.</string>
+    <string name="error_pickup_required">Kies een begin- en einduur.</string>
+    <string name="error_pickup_end_before_start">Het einduur moet na het beginuur liggen.</string>
+    <string name="error_pickup_end_passed">Het einduur is vandaag al voorbij.</string>
 </resources>
