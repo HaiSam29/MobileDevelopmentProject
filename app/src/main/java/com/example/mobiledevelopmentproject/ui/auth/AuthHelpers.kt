@@ -23,6 +23,10 @@ fun validateEmail(email: String): Int? = when {
 fun FirebaseException.toErrorMessage(): Int = when (this) {
     is FirebaseNetworkException -> R.string.error_no_internet
     is FirebaseTooManyRequestsException -> R.string.error_too_many_attempts
+    // Door email-enumeration-protectie geeft Firebase bij een fout wachtwoord én bij een
+    // onbekend e-mailadres dezelfde fout (INVALID_LOGIN_CREDENTIALS). We weten dus niet
+    // welk veld fout is, daarom één algemene melding. Zo verklappen we ook niet welke
+    // e-mailadressen een account hebben.
     is FirebaseAuthInvalidCredentialsException,
     is FirebaseAuthInvalidUserException -> R.string.error_wrong_credentials
     is FirebaseFirestoreException ->

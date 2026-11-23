@@ -35,6 +35,11 @@
     <string name="button_create_bag">Pakket aanmaken</string>
     <string name="button_logout">Uitloggen</string>
 
+    <!-- Tijdelijk startscherm (HomePlaceholderScreen gebruikt deze nog) -->
+    <string name="home_placeholder">Je bent ingelogd.</string>
+    <string name="button_open_map">Naar de kaart</string>
+    <string name="button_open_my_store">Naar mijn winkel</string>
+
     <!-- Mijn winkel -->
     <string name="my_store_title">Mijn winkel</string>
     <string name="label_store_name">Naam van de winkel</string>
@@ -54,6 +59,20 @@
     <string name="button_save">Opslaan</string>
     <string name="button_retry">Opnieuw proberen</string>
     <string name="store_saved">Je winkel is opgeslagen.</string>
+
+    <!-- Locatie -->
+    <string name="location_rationale_title">Pakketten bij jou in de buurt</string>
+    <string name="location_rationale_text">We gebruiken je locatie om pakketten te tonen die dicht bij je zijn, met de afstand in km. Je locatie wordt nergens bewaard.</string>
+    <string name="location_rationale_precise">Kies bij voorkeur \"Precieze locatie\"</string>
+    <string name="location_rationale_pin">Liever niet? Zet dan zelf een pin op de kaart</string>
+    <string name="button_allow_location">Locatie toestaan</string>
+    <string name="button_choose_on_map">Zelf kiezen op de kaart</string>
+    <string name="location_loading">Je locatie zoeken…</string>
+    <string name="action_my_location">Mijn locatie</string>
+    <string name="pick_location_title">Kies je locatie</string>
+    <string name="location_permission_denied">Je gaf geen toegang tot je locatie.</string>
+    <string name="button_use_location">Gebruik deze locatie</string>
+    <string name="location_pin_saved">Je locatie is opgeslagen.</string>
 
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>
@@ -81,4 +100,6 @@
     <string name="error_city_required">Vul de gemeente in.</string>
     <string name="error_address_lookup_failed">Adres opzoeken is mislukt. Probeer het later opnieuw.</string>
     <string name="error_address_not_found">Geen adres gevonden op deze plek.</string>
+    <string name="error_location_off">Locatie staat uit op je toestel. Zet ze aan in de instellingen of kies zelf een plek op de kaart.</string>
+    <string name="error_location_not_found">We vinden je locatie nog niet. Probeer het opnieuw of kies zelf een plek op de kaart.</string>
 </resources>

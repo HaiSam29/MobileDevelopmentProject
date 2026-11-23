@@ -10,6 +10,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val MIN_PASSWORD_LENGTH = 6
+private const val ERROR_INVALID_EMAIL = "ERROR_INVALID_EMAIL"
 
 data class RegisterUiState(
     val name: String = "",
@@ -81,8 +83,14 @@ class RegisterViewModel(
             try {
                 repository.register(name, email, state.password, state.role)
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            } catch (e: CancellationException) {
+                // De coroutine wordt gestopt (scherm weg), dat is geen fout.
+                throw e
             } catch (e: FirebaseException) {
                 _uiState.update { it.withError(e).copy(isLoading = false) }
+            } catch (e: Exception) {
+                // Vangnet: elke andere fout geeft een algemene melding in plaats van een crash.
+                _uiState.update { it.copy(isLoading = false, generalError = R.string.error_general) }
             }
         }
     }
@@ -99,7 +107,13 @@ class RegisterViewModel(
     private fun RegisterUiState.withError(e: FirebaseException): RegisterUiState = when (e) {
         is FirebaseAuthUserCollisionException -> copy(emailError = R.string.error_email_in_use)
         is FirebaseAuthWeakPasswordException -> copy(passwordError = R.string.error_password_too_short)
-        is FirebaseAuthInvalidCredentialsException -> copy(emailError = R.string.error_email_invalid)
+        // Firebase gebruikt InvalidCredentials voor meerdere fouten, enkel deze code gaat over het e-mailadres.
+        is FirebaseAuthInvalidCredentialsException ->
+            if (e.errorCode == ERROR_INVALID_EMAIL) {
+                copy(emailError = R.string.error_email_invalid)
+            } else {
+                copy(generalError = R.string.error_general)
+            }
         else -> copy(generalError = e.toErrorMessage())
     }
 }
