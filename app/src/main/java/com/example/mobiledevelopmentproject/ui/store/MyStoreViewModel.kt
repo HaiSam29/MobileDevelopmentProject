@@ -16,7 +16,6 @@ import com.example.mobiledevelopmentproject.data.model.MapPoint
 import com.example.mobiledevelopmentproject.data.model.Store
 import com.example.mobiledevelopmentproject.data.model.StoreCategory
 import com.example.mobiledevelopmentproject.ui.auth.toErrorMessage
-import com.example.mobiledevelopmentproject.ui.map.MapPoint
 import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.Job
