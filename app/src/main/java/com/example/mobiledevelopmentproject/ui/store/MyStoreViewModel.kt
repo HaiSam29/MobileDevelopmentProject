@@ -113,16 +113,17 @@ class MyStoreViewModel(
         _uiState.update { it.copy(category = category, categoryError = null, saveError = null) }
     }
 
+    // Typt de handelaar zelf een adres, dan is een eerdere fout bij het opzoeken niet meer van toepassing.
     fun onStreetChange(street: String) {
-        _uiState.update { it.copy(street = street, streetError = null, saveError = null) }
+        _uiState.update { it.copy(street = street, streetError = null, saveError = null, addressLookupError = null) }
     }
 
     fun onPostcodeChange(postcode: String) {
-        _uiState.update { it.copy(postcode = postcode, postcodeError = null, saveError = null) }
+        _uiState.update { it.copy(postcode = postcode, postcodeError = null, saveError = null, addressLookupError = null) }
     }
 
     fun onCityChange(city: String) {
-        _uiState.update { it.copy(city = city, cityError = null, saveError = null) }
+        _uiState.update { it.copy(city = city, cityError = null, saveError = null, addressLookupError = null) }
     }
 
     // Opgeroepen na een tik op de kaart of als de pin losgelaten wordt, nooit tijdens het slepen.
