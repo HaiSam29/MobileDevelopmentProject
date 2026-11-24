@@ -1,22 +1,31 @@
 package com.example.mobiledevelopmentproject.ui.bag
 
+import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mobiledevelopmentproject.R
 import com.example.mobiledevelopmentproject.data.AuthRepository
 import com.example.mobiledevelopmentproject.data.BagRepository
+import com.example.mobiledevelopmentproject.data.PhotoEncoder
 import com.example.mobiledevelopmentproject.data.StoreRepository
 import com.example.mobiledevelopmentproject.data.model.Bag
 import com.example.mobiledevelopmentproject.data.model.Store
 import com.example.mobiledevelopmentproject.ui.auth.toErrorMessage
 import com.google.firebase.FirebaseException
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 data class CreateBagUiState(
@@ -29,6 +38,12 @@ data class CreateBagUiState(
     // Ophaalvenster in minuten na middernacht (17:30 = 1050), null = nog niet gekozen.
     val pickupStartMinutes: Int? = null,
     val pickupEndMinutes: Int? = null,
+    // De foto als Base64-tekst, "" = nog geen foto.
+    // Tekst en geen Bitmap: zo is het meteen klaar voor Firestore, en het blijft
+    // samen met de rest van de state in de ViewModel staan bij een rotatie.
+    val photoBase64: String = "",
+    // true terwijl een foto verkleind en omgezet wordt.
+    val isProcessingPhoto: Boolean = false,
     // De winkel van de handelaar, nodig om het pakket aan te koppelen.
     val store: Store? = null,
     // Laden en opslaan
@@ -45,12 +60,15 @@ data class CreateBagUiState(
     @StringRes val originalValueError: Int? = null,
     @StringRes val quantityError: Int? = null,
     @StringRes val pickupError: Int? = null,
+    @StringRes val photoError: Int? = null,
     // Algemene foutmeldingen
     @StringRes val loadError: Int? = null,
     @StringRes val saveError: Int? = null
 )
 
+// contentResolver is nodig om een foto uit de galerij te lezen, zie Factory onderaan.
 class CreateBagViewModel(
+    private val contentResolver: ContentResolver,
     private val bagRepository: BagRepository = BagRepository(),
     private val storeRepository: StoreRepository = StoreRepository(),
     private val authRepository: AuthRepository = AuthRepository()
@@ -126,9 +144,44 @@ class CreateBagViewModel(
         }
     }
 
+    // Foto van de camera-app. TakePicturePreview geeft meteen een (kleine) Bitmap.
+    fun onPhotoTaken(bitmap: Bitmap) {
+        processPhoto { PhotoEncoder.encodeBitmap(bitmap) }
+    }
+
+    // Foto uit de galerij. We krijgen enkel een Uri (een adres van de foto), geen Bitmap.
+    fun onPhotoPicked(uri: Uri) {
+        processPhoto { PhotoEncoder.encodeUri(contentResolver, uri) }
+    }
+
+    fun onCameraUnavailable() {
+        _uiState.update { it.copy(photoError = R.string.error_no_camera) }
+    }
+
+    // Zet een foto om naar Base64-tekst. encode geeft null als het niet lukt.
+    private fun processPhoto(encode: () -> String?) {
+        // Een nieuwe foto wist de oude foutmeldingen.
+        _uiState.update { it.copy(isProcessingPhoto = true, photoError = null, saveError = null) }
+
+        viewModelScope.launch {
+            // Verkleinen en comprimeren is zwaar rekenwerk. Op de main thread
+            // zou het scherm haperen, daarom op Dispatchers.Default.
+            val base64 = withContext(Dispatchers.Default) { encode() }
+            _uiState.update {
+                if (base64 == null) {
+                    // De vorige foto (als die er was) blijft staan.
+                    it.copy(isProcessingPhoto = false, photoError = R.string.error_photo_failed)
+                } else {
+                    it.copy(isProcessingPhoto = false, photoBase64 = base64)
+                }
+            }
+        }
+    }
+
     fun save() {
         val state = _uiState.value
-        if (state.isLoadingStore || state.isSaving) return
+        // Tijdens het omzetten van een foto nog niet opslaan, anders bewaren we de oude foto.
+        if (state.isLoadingStore || state.isSaving || state.isProcessingPhoto) return
 
         // Het huidige uur, om te controleren dat het einduur nog niet voorbij is.
         val now = Calendar.getInstance()
@@ -163,8 +216,7 @@ class CreateBagViewModel(
             pickupStart = todayAt(requireNotNull(state.pickupStartMinutes)),
             pickupEnd = todayAt(requireNotNull(state.pickupEndMinutes)),
             active = true,
-            // De foto komt in H4.
-            photoBase64 = "",
+            photoBase64 = state.photoBase64,
             createdAt = System.currentTimeMillis()
         )
 
@@ -176,6 +228,20 @@ class CreateBagViewModel(
                 _uiState.update { it.copy(isSaving = false, isSaved = true) }
             } catch (e: FirebaseException) {
                 _uiState.update { it.copy(isSaving = false, saveError = e.toErrorMessage()) }
+            }
+        }
+    }
+
+    companion object {
+        // Een ViewModel mag geen Activity of Context bijhouden: na een rotatie wordt de
+        // Activity vernietigd, maar de ViewModel leeft verder en zou de oude Activity
+        // in het geheugen vasthouden (geheugenlek). De Application leeft zo lang als de app,
+        // dus haar ContentResolver mag de ViewModel wel bijhouden.
+        // De factory haalt de Application op en geeft de ContentResolver mee.
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                CreateBagViewModel(application.contentResolver)
             }
         }
     }
@@ -227,11 +293,14 @@ private fun CreateBagUiState.validate(nowMinutes: Int): CreateBagUiState {
             // Het venster is vandaag: een einduur dat al voorbij is heeft geen zin.
             end <= nowMinutes -> R.string.error_pickup_end_passed
             else -> null
-        }
+        },
+        // De foto is verplicht: de klant ziet ze in de lijst en op het detailscherm.
+        photoError = if (photoBase64.isEmpty()) R.string.error_photo_required else null
     )
 }
 
 private fun CreateBagUiState.hasFieldErrors(): Boolean {
-    return listOf(titleError, descriptionError, priceError, originalValueError, quantityError, pickupError)
-        .any { it != null }
+    return listOf(
+        titleError, descriptionError, priceError, originalValueError, quantityError, pickupError, photoError
+    ).any { it != null }
 }

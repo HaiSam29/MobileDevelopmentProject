@@ -83,6 +83,11 @@
 
     <!-- Pakket aanmaken (H3) -->
     <string name="create_bag_title">Nieuw pakket</string>
+    <string name="label_photo">Foto</string>
+    <string name="hint_add_photo">Voeg een foto van het pakket toe</string>
+    <string name="button_camera">Camera</string>
+    <string name="button_gallery">Galerij</string>
+    <string name="content_description_bag_photo">Foto van het pakket</string>
     <string name="label_bag_title">Titel</string>
     <string name="hint_bag_title">Bv. Verrassingspakket brood</string>
     <string name="label_bag_description">Beschrijving</string>
@@ -134,4 +139,7 @@
     <string name="error_pickup_required">Kies een begin- en einduur.</string>
     <string name="error_pickup_end_before_start">Het einduur moet na het beginuur liggen.</string>
     <string name="error_pickup_end_passed">Het einduur is vandaag al voorbij.</string>
+    <string name="error_photo_required">Voeg een foto toe.</string>
+    <string name="error_photo_failed">De foto kon niet geladen worden. Probeer een andere.</string>
+    <string name="error_no_camera">Er is geen camera-app op dit toestel. Kies een foto uit de galerij.</string>
 </resources>
