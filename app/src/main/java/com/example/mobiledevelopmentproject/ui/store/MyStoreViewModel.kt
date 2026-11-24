@@ -10,6 +10,7 @@ import com.example.mobiledevelopmentproject.R
 import com.example.mobiledevelopmentproject.data.AuthRepository
 import com.example.mobiledevelopmentproject.data.GeocodingException
 import com.example.mobiledevelopmentproject.data.GeocodingRepository
+import com.example.mobiledevelopmentproject.data.NetworkChecker
 import com.example.mobiledevelopmentproject.data.StoreRepository
 import com.example.mobiledevelopmentproject.data.local.AppDatabase
 import com.example.mobiledevelopmentproject.data.model.MapPoint
@@ -62,6 +63,7 @@ data class MyStoreUiState(
 
 class MyStoreViewModel(
     private val geocodingRepository: GeocodingRepository,
+    private val networkChecker: NetworkChecker,
     private val storeRepository: StoreRepository = StoreRepository(),
     private val authRepository: AuthRepository = AuthRepository()
 ) : ViewModel() {
@@ -192,6 +194,13 @@ class MyStoreViewModel(
             return
         }
 
+        // Zonder internet roepen we set() niet aan. Firestore zou de winkel anders in een
+        // wachtrij zetten en later toch opslaan, terwijl we "geen internet" gemeld hebben.
+        if (!networkChecker.isOnline()) {
+            _uiState.update { it.copy(saveError = R.string.error_no_internet) }
+            return
+        }
+
         // validate() heeft gecontroleerd dat category en pin niet null zijn.
         val pin = requireNotNull(state.pin)
         val store = Store(
@@ -218,13 +227,13 @@ class MyStoreViewModel(
     }
 
     companion object {
-        // GeocodingRepository heeft de DAO uit Room nodig, en daarvoor een Context.
+        // GeocodingRepository (DAO uit Room) en NetworkChecker hebben een Context nodig.
         // Een factory geeft de ViewModel die mee, zonder dat de ViewModel zelf een Context bijhoudt.
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = checkNotNull(this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
                 val dao = AppDatabase.getInstance(application).cachedAddressDao()
-                MyStoreViewModel(GeocodingRepository(dao))
+                MyStoreViewModel(GeocodingRepository(dao), NetworkChecker(application))
             }
         }
     }
