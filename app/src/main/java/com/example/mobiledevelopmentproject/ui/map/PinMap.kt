@@ -17,7 +17,7 @@ private const val PIN_MARKER_ID = "pin"
 
 // Kaart waarop de gebruiker één pin zet met een tik, of de pin versleept
 // (lang drukken op de pin en dan slepen).
-// onPinPlaced wordt enkel opgeroepen na een tik of als de pin losgelaten wordt,
+// onPinPlaced wordt enkel opgeroepen na een tik (op de kaart of op de pin) of als de pin losgelaten wordt,
 // nooit tijdens het slepen of het verschuiven van de kaart. Zo vraagt de ViewModel
 // niet bij elke beweging een adres op.
 // De pin zelf staat in de ViewModel: deze composable tekent enkel wat in pin staat.
@@ -104,6 +104,13 @@ private fun createMarker(mapView: MapView, onDragEnd: (MapPoint) -> Unit): Marke
         isDraggable = true
         // Geen tekstballon bij een tik op de pin.
         infoWindow = null
+        // Een tik op de pin zelf doet hetzelfde als loslaten: het adres opnieuw opzoeken.
+        // Handig als de vorige opzoeking mislukte (bv. zonder internet).
+        // true: osmdroid moet de tik niet meer zelf afhandelen (anders centreert het de kaart).
+        setOnMarkerClickListener { clickedMarker, _ ->
+            onDragEnd(MapPoint(clickedMarker.position.latitude, clickedMarker.position.longitude))
+            true
+        }
         setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
             override fun onMarkerDragStart(marker: Marker) {}
 
