@@ -160,8 +160,16 @@ class MyStoreViewModel(
                 }
             } catch (e: GeocodingException) {
                 // De pin blijft staan, de handelaar kan het adres zelf intypen.
+                // De velden worden leeggemaakt: het oude adres hoort niet bij de nieuwe pin.
+                // Zo vangt de validatie het op als de handelaar meteen op Opslaan drukt.
                 _uiState.update {
-                    it.copy(isLookingUpAddress = false, addressLookupError = e.toErrorMessage())
+                    it.copy(
+                        street = "",
+                        postcode = "",
+                        city = "",
+                        isLookingUpAddress = false,
+                        addressLookupError = e.toErrorMessage()
+                    )
                 }
             }
         }
@@ -219,7 +227,8 @@ class MyStoreViewModel(
             try {
                 // Maakt de winkel aan, of overschrijft de bestaande (zelfde document-id).
                 storeRepository.saveStore(store)
-                _uiState.update { it.copy(isSaving = false, isSaved = true) }
+                // Een oude fout bij het opzoeken van het adres is niet meer van toepassing.
+                _uiState.update { it.copy(isSaving = false, isSaved = true, addressLookupError = null) }
             } catch (e: FirebaseException) {
                 _uiState.update { it.copy(isSaving = false, saveError = e.toErrorMessage()) }
             }
