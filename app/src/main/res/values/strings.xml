@@ -31,7 +31,6 @@
     <string name="customer_home_title">Ontdekken</string>
     <string name="home_greeting">Hallo %1$s</string>
     <string name="button_my_store">Mijn winkel</string>
-    <string name="button_create_bag">Pakket aanmaken</string>
     <string name="button_logout">Uitloggen</string>
 
     <!-- Navigatiebalk van de klant -->
@@ -39,6 +38,14 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_orders">Bestellingen</string>
     <string name="tab_favorites">Favorieten</string>
+
+    <!-- Navigatiebalk van de handelaar -->
+    <string name="tab_my_store">Mijn winkel</string>
+    <string name="tab_my_bags">Mijn pakketten</string>
+
+    <!-- Mijn pakketten -->
+    <string name="my_bags_title">Mijn pakketten</string>
+    <string name="button_new_bag">Nieuw pakket</string>
 
     <!-- Tijdelijke schermen, tot ze echt gebouwd zijn -->
     <string name="orders_title">Bestellingen</string>

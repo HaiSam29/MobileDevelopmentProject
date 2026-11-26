@@ -61,6 +61,7 @@ import com.example.mobiledevelopmentproject.data.model.StoreCategory
 import com.example.mobiledevelopmentproject.ui.auth.ErrorMessage
 import com.example.mobiledevelopmentproject.ui.auth.LabeledTextField
 import com.example.mobiledevelopmentproject.ui.auth.LoadingButton
+import com.example.mobiledevelopmentproject.ui.discover.LogoutIconButton
 import com.example.mobiledevelopmentproject.ui.map.PinMap
 
 private val MAP_HEIGHT = 220.dp
@@ -68,6 +69,7 @@ private val MAP_HEIGHT = 220.dp
 // Koppelt de ViewModel aan het scherm.
 @Composable
 fun MyStoreScreen(
+    onLogoutClick: () -> Unit,
     viewModel: MyStoreViewModel = viewModel(factory = MyStoreViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -85,7 +87,7 @@ fun MyStoreScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
-        topBar = { MyStoreTopBar() },
+        topBar = { MyStoreTopBar(onLogoutClick = onLogoutClick) },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         val contentModifier = Modifier
@@ -111,15 +113,25 @@ fun MyStoreScreen(
     }
 }
 
+// Titel links, uitlogicoon rechts, zoals in ontwerp 08.
 @Composable
-private fun MyStoreTopBar() {
+private fun MyStoreTopBar(onLogoutClick: () -> Unit) {
     Column(modifier = Modifier.statusBarsPadding()) {
-        Text(
-            text = stringResource(R.string.my_store_title),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.my_store_title),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            // Hetzelfde icoon als bij de klant in Ontdekken.
+            LogoutIconButton(onClick = onLogoutClick)
+        }
         HorizontalDivider()
     }
 }

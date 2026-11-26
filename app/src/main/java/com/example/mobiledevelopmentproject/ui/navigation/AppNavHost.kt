@@ -2,6 +2,8 @@ package com.example.mobiledevelopmentproject.ui.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,9 +14,9 @@ import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
 import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
 import com.example.mobiledevelopmentproject.ui.bag.CreateBagScreen
 import com.example.mobiledevelopmentproject.ui.customer.CustomerMainScreen
-import com.example.mobiledevelopmentproject.ui.merchant.MerchantHomeScreen
+import com.example.mobiledevelopmentproject.ui.merchant.MerchantMainScreen
+import com.example.mobiledevelopmentproject.ui.merchant.MerchantTab
 import com.example.mobiledevelopmentproject.ui.start.StartScreen
-import com.example.mobiledevelopmentproject.ui.store.MyStoreScreen
 
 private object Routes {
     const val START = "start"
@@ -22,13 +24,15 @@ private object Routes {
     const val REGISTER = "register"
     const val CUSTOMER_HOME = "customer_home"
     const val MERCHANT_HOME = "merchant_home"
-    const val MY_STORE = "my_store"
     const val CREATE_BAG = "create_bag"
 
     // De naam gaat mee als optioneel argument, zo werkt het ook met een lege naam.
     const val ARG_NAME = "name"
     const val CUSTOMER_HOME_WITH_NAME = "$CUSTOMER_HOME?$ARG_NAME={$ARG_NAME}"
     const val MERCHANT_HOME_WITH_NAME = "$MERCHANT_HOME?$ARG_NAME={$ARG_NAME}"
+
+    // Sleutel in de savedStateHandle van het handelaarsscherm: welke tab moet open.
+    const val KEY_OPEN_TAB = "open_tab"
 }
 
 private val nameArgument = listOf(
@@ -71,27 +75,32 @@ fun AppNavHost() {
                 onLoggedOut = { navController.navigateToLogin() }
             )
         }
+        // Het hoofdscherm van de handelaar, met de navigatiebalk en de twee tabs.
+        // De naam in de route wordt hier niet meer gebruikt, maar blijft voor StartScreen.
         composable(Routes.MERCHANT_HOME_WITH_NAME, arguments = nameArgument) { entry ->
-            MerchantHomeScreen(
-                name = entry.arguments?.getString(Routes.ARG_NAME).orEmpty(),
-                onMyStoreClick = { navController.navigate(Routes.MY_STORE) },
+            // Een andere bestemming kan hier een tab klaarzetten, zie CREATE_BAG hieronder.
+            val openTabName by entry.savedStateHandle
+                .getStateFlow<String?>(Routes.KEY_OPEN_TAB, null)
+                .collectAsStateWithLifecycle()
+            MerchantMainScreen(
+                openTab = openTabName?.let { MerchantTab.valueOf(it) },
+                onOpenTabHandled = { entry.savedStateHandle[Routes.KEY_OPEN_TAB] = null },
                 onCreateBagClick = { navController.navigate(Routes.CREATE_BAG) },
                 onLoggedOut = { navController.navigateToLogin() }
             )
         }
-        composable(Routes.MY_STORE) {
-            MyStoreScreen()
-        }
+        // Pakket aanmaken staat buiten de tabs, dus zonder navigatiebalk.
+        // Terug en "Pakket plaatsen" gaan terug naar het handelaarsscherm (tab Mijn pakketten).
         composable(Routes.CREATE_BAG) {
             CreateBagScreen(
                 onBackClick = { navController.navigateUp() },
                 onBagCreated = { navController.navigateUp() },
-                // Zonder winkel naar "Mijn winkel". popUpTo haalt dit scherm van de backstack,
-                // zodat Terug daarna naar het startscherm gaat en niet naar een leeg formulier.
+                // Zonder winkel: terug naar het handelaarsscherm en daar de tab "Mijn winkel" openen.
+                // We zetten de tab klaar in de savedStateHandle van het vorige scherm.
                 onMyStoreClick = {
-                    navController.navigate(Routes.MY_STORE) {
-                        popUpTo(Routes.CREATE_BAG) { inclusive = true }
-                    }
+                    navController.previousBackStackEntry?.savedStateHandle
+                        ?.set(Routes.KEY_OPEN_TAB, MerchantTab.MY_STORE.name)
+                    navController.navigateUp()
                 }
             )
         }
