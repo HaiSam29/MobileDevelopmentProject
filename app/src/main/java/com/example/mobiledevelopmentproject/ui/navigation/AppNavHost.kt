@@ -11,8 +11,7 @@ import androidx.navigation.navArgument
 import com.example.mobiledevelopmentproject.ui.auth.LoginScreen
 import com.example.mobiledevelopmentproject.ui.auth.RegisterScreen
 import com.example.mobiledevelopmentproject.ui.bag.CreateBagScreen
-import com.example.mobiledevelopmentproject.ui.customer.CustomerHomeScreen
-import com.example.mobiledevelopmentproject.ui.map.MapScreen
+import com.example.mobiledevelopmentproject.ui.customer.CustomerMainScreen
 import com.example.mobiledevelopmentproject.ui.merchant.MerchantHomeScreen
 import com.example.mobiledevelopmentproject.ui.start.StartScreen
 import com.example.mobiledevelopmentproject.ui.store.MyStoreScreen
@@ -23,7 +22,6 @@ private object Routes {
     const val REGISTER = "register"
     const val CUSTOMER_HOME = "customer_home"
     const val MERCHANT_HOME = "merchant_home"
-    const val MAP = "map"
     const val MY_STORE = "my_store"
     const val CREATE_BAG = "create_bag"
 
@@ -67,9 +65,9 @@ fun AppNavHost() {
             )
         }
         composable(Routes.CUSTOMER_HOME_WITH_NAME, arguments = nameArgument) { entry ->
-            CustomerHomeScreen(
+            // Het hoofdscherm van de klant, met de navigatiebalk en de vier tabs.
+            CustomerMainScreen(
                 name = entry.arguments?.getString(Routes.ARG_NAME).orEmpty(),
-                onMapClick = { navController.navigate(Routes.MAP) },
                 onLoggedOut = { navController.navigateToLogin() }
             )
         }
@@ -80,9 +78,6 @@ fun AppNavHost() {
                 onCreateBagClick = { navController.navigate(Routes.CREATE_BAG) },
                 onLoggedOut = { navController.navigateToLogin() }
             )
-        }
-        composable(Routes.MAP) {
-            MapScreen()
         }
         composable(Routes.MY_STORE) {
             MyStoreScreen()

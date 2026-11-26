@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -22,7 +21,6 @@ import com.example.mobiledevelopmentproject.R
 @Composable
 fun CustomerHomeScreen(
     name: String,
-    onMapClick: () -> Unit,
     onLoggedOut: () -> Unit,
     viewModel: CustomerHomeViewModel = viewModel()
 ) {
@@ -45,9 +43,6 @@ fun CustomerHomeScreen(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Button(onClick = onMapClick) {
-                Text(text = stringResource(R.string.button_map))
-            }
             // Eerst uitloggen, daarna pas naar het inlogscherm.
             OutlinedButton(
                 onClick = {
