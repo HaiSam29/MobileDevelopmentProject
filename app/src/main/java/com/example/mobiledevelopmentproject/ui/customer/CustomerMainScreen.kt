@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -24,8 +25,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mobiledevelopmentproject.R
+import com.example.mobiledevelopmentproject.ui.discover.DiscoverScreen
 import com.example.mobiledevelopmentproject.ui.favorites.FavoritesScreen
 import com.example.mobiledevelopmentproject.ui.map.MapScreen
+import com.example.mobiledevelopmentproject.ui.map.MapViewModel
 import com.example.mobiledevelopmentproject.ui.orders.OrdersScreen
 
 // De vier tabs van de klant. Elke tab heeft een eigen route, label en icoon.
@@ -53,6 +56,12 @@ fun CustomerMainScreen(
     // de gekozen tab overleeft dus een rotatie.
     val tabNavController = rememberNavController()
 
+    // Eén MapViewModel voor Ontdekken én Kaart. Hij wordt hier gemaakt, buiten de NavHost
+    // van de tabs: hij hoort dan bij het klantscherm zelf en niet bij één tab.
+    // Zo tonen beide tabs dezelfde locatie, overleeft hij een rotatie,
+    // en verdwijnt hij bij uitloggen samen met het klantscherm.
+    val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
+
     Scaffold(
         bottomBar = { CustomerNavigationBar(tabNavController) },
         // Geen ruimte voor de statusbalk hier: de schermen in de tabs doen dat zelf,
@@ -68,12 +77,18 @@ fun CustomerMainScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
         ) {
-            // Ontdekken is voorlopig het startscherm van Mohamed, met de uitlogknop.
+            // Ontdekken: de kop met de gemeente, met daaronder het scherm van Mohamed.
+            // "Wijzig" gaat naar de Kaart-tab, waar de klant zijn locatie aanpast.
             composable(CustomerTab.DISCOVER.route) {
-                CustomerHomeScreen(name = name, onLoggedOut = onLoggedOut)
+                DiscoverScreen(
+                    name = name,
+                    mapViewModel = mapViewModel,
+                    onChangeLocation = { tabNavController.navigateToTab(CustomerTab.MAP) },
+                    onLoggedOut = onLoggedOut
+                )
             }
             composable(CustomerTab.MAP.route) {
-                MapScreen()
+                MapScreen(viewModel = mapViewModel)
             }
             composable(CustomerTab.ORDERS.route) {
                 OrdersScreen()

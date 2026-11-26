@@ -42,7 +42,8 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 
 // FINE en COARSE altijd samen vragen: dan kiest de gebruiker zelf tussen precies en benadering.
-private val LOCATION_PERMISSIONS = arrayOf(
+// Ook gebruikt in Ontdekken.
+val LOCATION_PERMISSIONS = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
     Manifest.permission.ACCESS_COARSE_LOCATION
 )
@@ -167,9 +168,9 @@ private fun centerMap(mapView: MapView, point: MapPoint, zoom: Double) {
     }
 }
 
-// Kaartje bovenaan zolang de locatie opgehaald wordt.
+// Kaartje bovenaan zolang de locatie opgehaald wordt. Ook gebruikt in Ontdekken.
 @Composable
-private fun LoadingLocationCard(modifier: Modifier = Modifier) {
+fun LoadingLocationCard(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.padding(16.dp),
         shape = RoundedCornerShape(16.dp),
@@ -186,10 +187,10 @@ private fun LoadingLocationCard(modifier: Modifier = Modifier) {
     }
 }
 
-// Kaartje bovenaan als er geen locatie is (locatie staat uit, of nog niet gevonden).
+// Kaartje bovenaan als er geen locatie is (locatie staat uit, of nog niet gevonden). Ook gebruikt in Ontdekken.
 // De klant kan opnieuw proberen of zelf een plek kiezen: hij zit nooit vast.
 @Composable
-private fun LocationUnavailableCard(
+fun LocationUnavailableCard(
     @StringRes messageRes: Int,
     onRetryClick: () -> Unit,
     onChooseOnMapClick: () -> Unit,

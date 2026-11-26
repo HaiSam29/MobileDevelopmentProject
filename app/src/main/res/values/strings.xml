@@ -79,6 +79,14 @@
     <string name="button_use_location">Gebruik deze locatie</string>
     <string name="location_pin_saved">Je locatie is opgeslagen.</string>
 
+    <!-- Ontdekken: kop "Pakketten in de buurt van {gemeente}" (K2) -->
+    <string name="discover_nearby_label">Pakketten in de buurt van</string>
+    <string name="discover_nearby_fallback">Pakketten in de buurt</string>
+    <string name="discover_city_loading">Gemeente opzoeken…</string>
+    <string name="discover_change_location">Wijzig</string>
+    <string name="discover_approximate_warning">Je deelt enkel een benaderde locatie. De afstanden kunnen een paar km afwijken.</string>
+    <string name="button_allow_precise_location">Precieze locatie toestaan</string>
+
     <!-- Categorieën van een winkel -->
     <string name="category_bakery">Bakker</string>
     <string name="category_supermarket">Supermarkt</string>
@@ -133,6 +141,8 @@
     <string name="error_city_required">Vul de gemeente in.</string>
     <string name="error_address_lookup_failed">Adres opzoeken is mislukt. Probeer het later opnieuw.</string>
     <string name="error_address_not_found">Geen adres gevonden op deze plek.</string>
+    <string name="error_city_lookup_failed">De gemeente opzoeken is mislukt.</string>
+    <string name="error_city_not_found">Geen gemeente gevonden op deze plek.</string>
     <string name="error_location_off">Locatie staat uit op je toestel. Zet ze aan in de instellingen of kies zelf een plek op de kaart.</string>
     <string name="error_location_not_found">We vinden je locatie nog niet. Probeer het opnieuw of kies zelf een plek op de kaart.</string>
     <string name="error_bag_title_required">Vul een titel in.</string>
