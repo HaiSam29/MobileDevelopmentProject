@@ -1,6 +1,7 @@
 package com.example.mobiledevelopmentproject.ui.discover
 
 import android.Manifest
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,8 @@ import com.example.mobiledevelopmentproject.ui.map.PickLocationContent
 // De tab Ontdekken.
 // - Kop bovenaan (DiscoverHeader): "Pakketten in de buurt van {gemeente}", Wijzig en uitloggen.
 // - Met een locatie: daaronder het deel van Mohamed (CustomerHomeScreen), later de lijst met pakketten.
-// - Zonder locatie: de locatie-flow van de Kaart (uitleg, laden, geen locatie, pin kiezen).
+// - Zonder locatie: de locatie-flow van de Kaart (uitleg, laden, geen locatie).
+// - Pin-kaart (na "Wijzig" of "Zelf kiezen op de kaart"): met of zonder locatie.
 //
 // mapViewModel is dezelfde ViewModel als die van de Kaart-tab (gemaakt in CustomerMainScreen).
 // Zo tonen Ontdekken en Kaart altijd dezelfde locatie, en is de locatie-logica er maar één keer.
@@ -47,7 +49,6 @@ import com.example.mobiledevelopmentproject.ui.map.PickLocationContent
 fun DiscoverScreen(
     name: String,
     mapViewModel: MapViewModel,
-    onChangeLocation: () -> Unit,
     onLoggedOut: () -> Unit,
     viewModel: DiscoverViewModel = viewModel(factory = DiscoverViewModel.Factory),
     // Dezelfde ViewModel als in CustomerHomeScreen (zelfde tab, dus zelfde instantie).
@@ -77,6 +78,14 @@ fun DiscoverScreen(
         }
     }
 
+    // De pin-kaart is open: na "Wijzig", "Zelf kiezen op de kaart" of een weigering.
+    val isPicking = mapState.mode == LocationMode.PICK_PIN
+
+    // De terugknop van het toestel annuleert de pin-kaart, net als de pijl terug.
+    BackHandler(enabled = isPicking) {
+        mapViewModel.onPickPinBack()
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.surface
@@ -99,11 +108,14 @@ fun DiscoverScreen(
             // "Kies je locatie" bovenaan de hele breedte in). In de andere gevallen zonder locatie
             // staat enkel het uitlogicoon rechtsboven over de inhoud: een rij zou de uitleg
             // op een liggend scherm te weinig plaats geven.
-            val showHeaderRow = uiState.hasLocation || mapState.mode == LocationMode.PICK_PIN
+            val showHeaderRow = uiState.hasLocation || isPicking
             if (showHeaderRow) {
                 DiscoverHeader(
                     state = uiState,
-                    onChangeLocationClick = onChangeLocation,
+                    // Tijdens het kiezen heeft "Wijzig" geen zin.
+                    showChangeButton = !isPicking,
+                    // "Wijzig" opent de pin-kaart hier in Ontdekken, de pin start op de huidige locatie.
+                    onChangeLocationClick = mapViewModel::onChooseOnMap,
                     onRetryClick = viewModel::onRetryCity,
                     onLogoutClick = logout
                 )
@@ -113,7 +125,21 @@ fun DiscoverScreen(
                 .weight(1f)
                 .fillMaxWidth()
 
-            if (uiState.hasLocation) {
+            if (isPicking) {
+                // Dezelfde pin-kaart als op de Kaart. "Gebruik deze locatie" bewaart de pin,
+                // de pijl terug annuleert zonder iets te wijzigen.
+                PickLocationContent(
+                    pin = mapState.pin,
+                    center = mapState.mapCenter,
+                    zoom = mapState.mapZoom,
+                    permissionDenied = mapState.permissionDenied,
+                    onPinPlaced = mapViewModel::onPinPlaced,
+                    onPositionChange = mapViewModel::onMapPositionChange,
+                    onBackClick = mapViewModel::onPickPinBack,
+                    onUsePinClick = mapViewModel::onUsePin,
+                    modifier = contentModifier
+                )
+            } else if (uiState.hasLocation) {
                 Column(modifier = contentModifier) {
                     // De locatie wordt opnieuw opgehaald, bv. na "Precieze locatie toestaan".
                     if (mapState.mode == LocationMode.LOADING) {
@@ -138,14 +164,12 @@ fun DiscoverScreen(
                         onAllowClick = requestLocation,
                         modifier = Modifier.fillMaxSize()
                     )
-                    if (!showHeaderRow) {
-                        LogoutIconButton(
-                            onClick = logout,
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                        )
-                    }
+                    LogoutIconButton(
+                        onClick = logout,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    )
                 }
             }
         }
@@ -153,6 +177,7 @@ fun DiscoverScreen(
 }
 
 // Zolang er geen locatie is: dezelfde stappen als op de Kaart, met dezelfde composables.
+// (De pin-kaart staat hierboven in DiscoverScreen, want die kan ook mét locatie open zijn.)
 @Composable
 private fun NoLocationContent(
     mapState: MapUiState,
@@ -177,17 +202,6 @@ private fun NoLocationContent(
                 onChooseOnMapClick = mapViewModel::onChooseOnMap
             )
         }
-        mode == LocationMode.PICK_PIN -> PickLocationContent(
-            pin = mapState.pin,
-            center = mapState.mapCenter,
-            zoom = mapState.mapZoom,
-            permissionDenied = mapState.permissionDenied,
-            onPinPlaced = mapViewModel::onPinPlaced,
-            onPositionChange = mapViewModel::onMapPositionChange,
-            onBackClick = mapViewModel::onPickPinBack,
-            onUsePinClick = mapViewModel::onUsePin,
-            modifier = modifier
-        )
         // ASK: de uitleg met "Locatie toestaan" en "Zelf kiezen op de kaart".
         else -> LocationRationale(
             onAllowClick = onAllowClick,

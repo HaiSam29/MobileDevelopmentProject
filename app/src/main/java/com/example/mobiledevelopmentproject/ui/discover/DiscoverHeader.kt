@@ -42,6 +42,7 @@ import com.example.mobiledevelopmentproject.ui.theme.WarningText
 @Composable
 fun DiscoverHeader(
     state: DiscoverUiState,
+    showChangeButton: Boolean,
     onChangeLocationClick: () -> Unit,
     onRetryClick: () -> Unit,
     onLogoutClick: () -> Unit,
@@ -60,7 +61,7 @@ fun DiscoverHeader(
                         HeaderTitle(state = state, onRetryClick = onRetryClick)
                     }
                 }
-                if (state.hasLocation) {
+                if (state.hasLocation && showChangeButton) {
                     TextButton(onClick = onChangeLocationClick) {
                         Text(
                             text = stringResource(R.string.discover_change_location),
@@ -207,6 +208,7 @@ private fun DiscoverHeaderPreview() {
         Column {
             DiscoverHeader(
                 state = DiscoverUiState(hasLocation = true, city = "Mechelen"),
+                showChangeButton = true,
                 onChangeLocationClick = {},
                 onRetryClick = {},
                 onLogoutClick = {}

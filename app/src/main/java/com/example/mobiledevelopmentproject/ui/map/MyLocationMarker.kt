@@ -41,3 +41,29 @@ private fun createMyLocationMarker(mapView: MapView): Marker {
         setOnMarkerClickListener { _, _ -> true }
     }
 }
+
+// Herkent de marker van de gekozen pin (na "Gebruik deze locatie").
+private const val CHOSEN_PIN_MARKER_ID = "chosen_pin"
+
+// Toont de gekozen pin op de gewone kaart, op dezelfde manier als showMyLocation.
+// Deze pin is vast: verplaatsen gebeurt op de pin-kaart (PinMap) na "Zelf kiezen op de kaart".
+fun showChosenPin(mapView: MapView, pin: MapPoint?) {
+    var marker = mapView.overlays.filterIsInstance<Marker>().firstOrNull { it.id == CHOSEN_PIN_MARKER_ID }
+
+    if (pin == null) {
+        marker?.let { mapView.overlays.remove(it) }
+    } else {
+        if (marker == null) {
+            marker = Marker(mapView).apply {
+                id = CHOSEN_PIN_MARKER_ID
+                // Zelfde pin als op de pin-kaart: de punt onderaan staat op de gekozen plek.
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                infoWindow = null
+                setOnMarkerClickListener { _, _ -> true }
+            }
+            mapView.overlays.add(marker)
+        }
+        marker.position = GeoPoint(pin.latitude, pin.longitude)
+    }
+    mapView.invalidate()
+}

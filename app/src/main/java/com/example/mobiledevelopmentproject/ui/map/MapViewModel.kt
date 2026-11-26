@@ -31,11 +31,11 @@ enum class LocationMode {
     ASK,
     // De locatie wordt opgehaald.
     LOADING,
-    // De kaart met de eigen locatie als blauwe stip.
-    OWN_LOCATION,
+    // De kaart met de gekozen locatie: de eigen locatie als blauwe stip, of de gekozen pin.
+    SHOW_LOCATION,
     // Toestemming is er, maar er is geen locatie (locatie staat uit of nog niet gevonden).
     UNAVAILABLE,
-    // De klant zet zelf een pin op de kaart.
+    // De pin-kaart: de klant zet of verplaatst zelf een pin.
     PICK_PIN
 }
 
@@ -48,8 +48,10 @@ data class MapUiState(
     val myLocation: MapPoint? = null,
     // true bij toestemming "Bij benadering".
     val isApproximate: Boolean = false,
-    // De pin die de klant zelf zet.
+    // De pin op de pin-kaart, terwijl de klant hem zet of verplaatst.
     val pin: MapPoint? = null,
+    // De bevestigde pin (na "Gebruik deze locatie"), getoond bij mode SHOW_LOCATION.
+    val chosenPin: MapPoint? = null,
     // true als de toestemming geweigerd is: het scherm legt dan uit waarom de klant een pin zet.
     val permissionDenied: Boolean = false,
     // Waarom er geen locatie is, bij mode UNAVAILABLE.
@@ -102,15 +104,26 @@ class MapViewModel(
         fetchMyLocation()
     }
 
-    // Knop "Zelf kiezen op de kaart".
+    // Knop "Zelf kiezen op de kaart" (uitleg, Kaart) en "Wijzig" (Ontdekken).
+    // Werkt ook met toestemming. Is er al een locatie, dan start de pin daar.
     fun onChooseOnMap() {
+        val chosen = ChosenLocationRepository.location.value
+        if (chosen != null) {
+            _uiState.update { it.copy(pin = chosen.point, mapCenter = chosen.point, mapZoom = MY_LOCATION_ZOOM) }
+        }
         showPinPicker(permissionDenied = false)
     }
 
-    // Pijl terug bij "Kies je locatie": terug naar de uitleg, waar de klant
-    // alsnog toestemming kan geven. De pin blijft bewaard voor als hij terugkomt.
+    // Annuleren op de pin-kaart (pijl terug of de terugknop van het toestel).
+    // Er verandert niets: is er al een locatie, dan tonen we die opnieuw.
+    // Anders gaan we terug naar de uitleg, waar de klant alsnog toestemming kan geven.
     fun onPickPinBack() {
-        _uiState.update { it.copy(mode = LocationMode.ASK, permissionDenied = false) }
+        val chosen = ChosenLocationRepository.location.value
+        if (chosen != null) {
+            showChosenLocation(chosen)
+        } else {
+            _uiState.update { it.copy(mode = LocationMode.ASK, permissionDenied = false) }
+        }
     }
 
     // Opgeroepen na een tik op de kaart of als de pin losgelaten wordt.
@@ -119,9 +132,12 @@ class MapViewModel(
     }
 
     // Knop "Gebruik deze locatie": de pin wordt de gekozen locatie voor de hele app.
+    // Daarna sluit de pin-kaart en tonen Ontdekken en Kaart die pin.
     fun onUsePin() {
         val pin = _uiState.value.pin ?: return
-        ChosenLocationRepository.set(ChosenLocation(pin, LocationSource.PIN))
+        val chosen = ChosenLocation(pin, LocationSource.PIN)
+        ChosenLocationRepository.set(chosen)
+        showChosenLocation(chosen)
         _uiState.update { it.copy(isPinSaved = true) }
     }
 
@@ -160,28 +176,23 @@ class MapViewModel(
         }
     }
 
-    // Toont een locatie uit ChosenLocationRepository: een eigen locatie als blauwe stip,
-    // een eerder gekozen pin als pin die de klant nog kan verplaatsen.
+    // Toont een locatie uit ChosenLocationRepository op de kaart:
+    // een eigen locatie als blauwe stip, een gekozen pin als pin.
+    // Zo staat er altijd maar één van de twee: de locatie waarmee de app rekent.
     private fun showChosenLocation(chosen: ChosenLocation) {
+        val isPin = chosen.source == LocationSource.PIN
         _uiState.update {
-            when (chosen.source) {
-                LocationSource.PRECISE, LocationSource.APPROXIMATE -> it.copy(
-                    mode = LocationMode.OWN_LOCATION,
-                    myLocation = chosen.point,
-                    isApproximate = chosen.source == LocationSource.APPROXIMATE,
-                    mapCenter = chosen.point,
-                    mapZoom = MY_LOCATION_ZOOM,
-                    centerOn = chosen.point
-                )
-                // Geen centerOn: de pin-kaart wordt pas na deze stap gemaakt
-                // en start dan al op mapCenter.
-                LocationSource.PIN -> it.copy(
-                    mode = LocationMode.PICK_PIN,
-                    pin = chosen.point,
-                    mapCenter = chosen.point,
-                    mapZoom = MY_LOCATION_ZOOM
-                )
-            }
+            it.copy(
+                mode = LocationMode.SHOW_LOCATION,
+                myLocation = if (isPin) null else chosen.point,
+                chosenPin = if (isPin) chosen.point else null,
+                isApproximate = chosen.source == LocationSource.APPROXIMATE,
+                permissionDenied = false,
+                locationError = null,
+                mapCenter = chosen.point,
+                mapZoom = MY_LOCATION_ZOOM,
+                centerOn = chosen.point
+            )
         }
     }
 

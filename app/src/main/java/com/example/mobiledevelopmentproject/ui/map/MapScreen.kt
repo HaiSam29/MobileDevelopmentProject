@@ -1,6 +1,7 @@
 package com.example.mobiledevelopmentproject.ui.map
 
 import android.Manifest
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -81,6 +83,11 @@ fun MapScreen(
         }
     }
 
+    // De terugknop van het toestel annuleert de pin-kaart, net als de pijl terug.
+    BackHandler(enabled = uiState.mode == LocationMode.PICK_PIN) {
+        viewModel.onPickPinBack()
+    }
+
     Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
         val contentModifier = Modifier
             .fillMaxSize()
@@ -105,7 +112,7 @@ fun MapScreen(
                 modifier = contentModifier
             )
         } else {
-            // Eén OsmMap voor laden, eigen locatie en geen locatie: zo blijft het dezelfde
+            // Eén OsmMap voor laden, gekozen locatie en geen locatie: zo blijft het dezelfde
             // MapView als de mode wisselt, en springt de kaart niet terug naar het startpunt.
             Box(modifier = contentModifier) {
                 OsmMap(
@@ -115,7 +122,9 @@ fun MapScreen(
                     modifier = Modifier.fillMaxSize(),
                     onPositionChange = viewModel::onMapPositionChange,
                     update = { mapView ->
+                        // Hooguit één van beide is niet null: de eigen locatie of de gekozen pin.
                         showMyLocation(mapView, uiState.myLocation)
+                        showChosenPin(mapView, uiState.chosenPin)
                         uiState.centerOn?.let { point ->
                             centerMap(mapView, point, uiState.mapZoom)
                             viewModel.onCentered()
@@ -137,7 +146,20 @@ fun MapScreen(
                     )
                 }
 
-                // Opnieuw je locatie ophalen en de kaart erop centreren, bv. na verschuiven.
+                // Zelf een plek kiezen, ook met toestemming. Opent de pin-kaart.
+                // Niet bij UNAVAILABLE: daar staat dezelfde knop al in het kaartje.
+                if (uiState.mode != LocationMode.UNAVAILABLE) {
+                    ExtendedFloatingActionButton(
+                        onClick = viewModel::onChooseOnMap,
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 40.dp)
+                    ) {
+                        Text(text = stringResource(R.string.button_choose_on_map), fontWeight = FontWeight.SemiBold)
+                    }
+                }
+
+                // Terug naar de eigen locatie (ook na een gekozen pin) en de kaart erop centreren.
                 // Extra ruimte onderaan: de bronvermelding van OpenStreetMap staat rechtsonder
                 // en moet zichtbaar blijven.
                 FloatingActionButton(

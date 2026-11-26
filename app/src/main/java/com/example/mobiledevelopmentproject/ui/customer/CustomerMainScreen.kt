@@ -78,12 +78,10 @@ fun CustomerMainScreen(
                 .consumeWindowInsets(innerPadding)
         ) {
             // Ontdekken: de kop met de gemeente, met daaronder het scherm van Mohamed.
-            // "Wijzig" gaat naar de Kaart-tab, waar de klant zijn locatie aanpast.
             composable(CustomerTab.DISCOVER.route) {
                 DiscoverScreen(
                     name = name,
                     mapViewModel = mapViewModel,
-                    onChangeLocation = { tabNavController.navigateToTab(CustomerTab.MAP) },
                     onLoggedOut = onLoggedOut
                 )
             }
