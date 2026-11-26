@@ -98,7 +98,7 @@ fun DiscoverScreen(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
         ) {
-            // Zelfde volgorde als de uitlogknop van Mohamed: eerst uitloggen, dan navigeren.
+            // Eerst uitloggen (wist ook de locatie), dan pas naar het inlogscherm navigeren.
             val logout = {
                 homeViewModel.logout()
                 onLoggedOut()
@@ -151,9 +151,9 @@ fun DiscoverScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-                    // Hier komt de lijst van Mohamed. Zijn scherm (met uitlogknop) blijft ongewijzigd.
+                    // Hier komt de lijst van Mohamed. Uitloggen zit in de kop hierboven.
                     Box(modifier = Modifier.weight(1f)) {
-                        CustomerHomeScreen(name = name, onLoggedOut = onLoggedOut, viewModel = homeViewModel)
+                        CustomerHomeScreen(name = name, viewModel = homeViewModel)
                     }
                 }
             } else {
